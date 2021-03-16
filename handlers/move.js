@@ -17,6 +17,7 @@ function handleMove(request, response) {
   var snakeBody = mySnake.body;
 
   var possibleMoves = possibleImmediateMoves(mySnake.head, board);
+  console.log("POSSIBLE:", possibleMoves);
   var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
 
   console.log("MOVE: " + move);

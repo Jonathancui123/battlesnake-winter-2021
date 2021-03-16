@@ -3,7 +3,7 @@ const express = require("express");
 const handleIndex = require("./handlers/index");
 const handleStart = require("./handlers/start");
 const handleMove = require("./handlers/move");
-const handleend = require("./handlers/end");
+const handleEnd = require("./handlers/end");
 
 const PORT = process.env.PORT || 3000;
 

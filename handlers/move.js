@@ -93,7 +93,10 @@ const possibleImmediateMoves = (mySnakeHead, board) => {
     const snakeBody = snake.body;
     snakeBody.forEach((occupiedCoordinate) => {
       directions.forEach((direction) => {
-        if (occupiedCoordinate == anyAdjacents[direction]) {
+        if (
+          occupiedCoordinate.x == anyAdjacents[direction].x &&
+          occupiedCoordinate.y == anyAdjacents[direction].y
+        ) {
           legals[direction] = false;
         }
       });

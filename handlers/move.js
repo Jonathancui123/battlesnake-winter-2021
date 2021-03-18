@@ -5,6 +5,7 @@ const {
   right,
   adjacentTiles,
   directions,
+  boardToGrid,
 } = require("../utils");
 
 function handleMove(request, response) {
@@ -16,9 +17,23 @@ function handleMove(request, response) {
   var snakeHead = mySnake.head;
   var snakeBody = mySnake.body;
 
-  var possibleMoves = possibleImmediateMoves(mySnake.head, board);
-  console.log("POSSIBLE:", possibleMoves);
-  var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  var grid = boardToGrid(board);
+  const graph = new Graph(grid);
+
+  const closestApple = findClosestApple(allFood, snakeHead);
+  if (closestApple) {
+    const start = graph.grid[snakeHead.x][snakeHead.y];
+    const end = graph.grid[closestApple.x][closestApple.y];
+
+    const result = astar.search(graph, start, end);
+
+    //TEMP
+    response.status(200).send({ move: "UP" });
+  } else {
+    var possibleMoves = possibleImmediateMoves(mySnake.head, board);
+    console.log("POSSIBLE:", possibleMoves);
+    var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  }
 
   console.log("MOVE: " + move);
 
@@ -32,6 +47,11 @@ const findClosestApple = (allFood, { x, y }) => {
   shortestDistance = 100000;
   closestApple = { x, y };
   currDistance = 0;
+
+  if (allFood.length === 0) {
+    return undefined;
+  }
+
   for (i = 0; i < allFood.length; i++) {
     currDistance =
       Math.pow(x - allFood[i].x, 2) + Math.pow(y - allFood[i].y, 2);
@@ -43,15 +63,15 @@ const findClosestApple = (allFood, { x, y }) => {
   return closestApple;
 };
 
-appleArr = [
-  { x: 1, y: 100 },
-  { x: 2, y: 50 },
-  { x: 3, y: 4 },
-  { x: 3, y: 6 },
-  { x: 4, y: 4 },
-];
+// appleArr = [
+//   { x: 1, y: 100 },
+//   { x: 2, y: 50 },
+//   { x: 3, y: 4 },
+//   { x: 3, y: 6 },
+//   { x: 4, y: 4 },
+// ];
 
-console.log(findClosestApple(appleArr, { x: 5, y: 5 }));
+// console.log(findClosestApple(appleArr, { x: 5, y: 5 }));
 
 // findClosestApple
 // legalMoves --> don't (immediately) run into body, wall, or other snake

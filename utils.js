@@ -69,19 +69,44 @@ const adjacentTiles = ({ x, y }, height, width) => {
 
 const boardToGrid = (board) => {
   var value = 1; // by default
-  var myGrid = [...Array(board.height)].map(e => Array(board.width).fill(value));
+  var myGrid = [...Array(board.height)].map((e) =>
+    Array(board.width).fill(value)
+  );
   const snakes = board.snakes;
   snakes.forEach((snake) => {
     const snakeBody = snake.body;
     snakeBody.forEach((occupiedCoordinate) => {
-      myGrid[board.width - 1 - occupiedCoordinate.x, board.height - 1 - occupiedCoordinate.y] = 0;
+      myGrid[board.width - 1 - occupiedCoordinate.x][
+        board.height - 1 - occupiedCoordinate.y
+      ] = 0;
     });
   });
 
-
   console.log(myGrid);
-}
+};
 
 const directions = ["up", "down", "left", "right"];
 
-module.exports = { up, down, left, right, adjacentTiles, directions, boardToGrid };
+// Returns a string representing the direction of a destination that is adjacent to the source
+const findAdjacentDirection = (source, destination) => {
+  if (destination.x === source.x && destination.y === source.y + 1) {
+    return "up";
+  } else if (destination.x === source.x && destination.y === source.y - 1) {
+    return "down";
+  } else if (destination.x === source.x + 1 && destination.y === source.y) {
+    return "right";
+  } else { // defaults to "left" if invalid inputs are not adjacent
+    return "left";
+  }
+};
+
+module.exports = {
+  up,
+  down,
+  left,
+  right,
+  adjacentTiles,
+  directions,
+  boardToGrid,
+  findAdjacentDirection,
+};

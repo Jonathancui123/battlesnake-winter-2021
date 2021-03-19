@@ -67,6 +67,21 @@ const adjacentTiles = ({ x, y }, height, width) => {
 // console.log(adjacentTiles({ x: 5, y: 10 }, 11, 11));
 // console.log(adjacentTiles({ x: 5, y: 5 }, 11, 11));
 
+const boardToGrid = (board) => {
+  var value = 1; // by default
+  var myGrid = [...Array(board.height)].map(e => Array(board.width).fill(value));
+  const snakes = board.snakes;
+  snakes.forEach((snake) => {
+    const snakeBody = snake.body;
+    snakeBody.forEach((occupiedCoordinate) => {
+      myGrid[board.width - 1 - occupiedCoordinate.x, board.height - 1 - occupiedCoordinate.y] = 0;
+    });
+  });
+
+
+  console.log(myGrid);
+}
+
 const directions = ["up", "down", "left", "right"];
 
-module.exports = { up, down, left, right, adjacentTiles, directions };
+module.exports = { up, down, left, right, adjacentTiles, directions, boardToGrid };

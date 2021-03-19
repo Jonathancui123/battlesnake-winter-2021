@@ -23,15 +23,17 @@ function handleMove(request, response) {
   const closestApple = findClosestApple(allFood, snakeHead);
   if (closestApple) {
     const start = graph.grid[snakeHead.x][snakeHead.y];
-  const end = graph.grid[closestApple.x][closestApple.y];
-  } else {
-    
-  }
-  
+    const end = graph.grid[closestApple.x][closestApple.y];
 
-  // var possibleMoves = possibleImmediateMoves(mySnake.head, board);
-  // console.log("POSSIBLE:", possibleMoves);
-  // var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+    const result = astar.search(graph, start, end);
+
+    //TEMP
+    response.status(200).send({ move: "UP" });
+  } else {
+    var possibleMoves = possibleImmediateMoves(mySnake.head, board);
+    console.log("POSSIBLE:", possibleMoves);
+    var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  }
 
   console.log("MOVE: " + move);
 
@@ -46,8 +48,8 @@ const findClosestApple = (allFood, { x, y }) => {
   closestApple = { x, y };
   currDistance = 0;
 
-  if (allFood.length === 0){
-    return undefined
+  if (allFood.length === 0) {
+    return undefined;
   }
 
   for (i = 0; i < allFood.length; i++) {

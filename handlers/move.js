@@ -8,11 +8,13 @@ const {
   boardToGrid,
 } = require("../utils");
 
-function handleMove(request, response) {
+function handleMove(request, response) { 
   var gameData = request.body;
   var mySnake = gameData.you;
   var board = gameData.board;
   var allFood = board.food;
+
+  console.log(gameData);
 
   var snakeHead = mySnake.head;
 
@@ -26,6 +28,9 @@ function handleMove(request, response) {
     const end = graph.grid[closestApple.x][closestApple.y];
 
     const result = astar.search(graph, start, end);
+    console.log("astar: ", result);
+    console.log("snakehead: ", snakeHead);
+    console.log("closest apple: ", closestApple);
     if (result) {
       const direction = findAdjacentDirection(snakeHead, result[0]);
       console.log("MOVE:", direction);

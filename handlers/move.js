@@ -19,9 +19,6 @@ function handleMove(request, response) {
   var mySnake = gameData.you;
   var board = gameData.board;
   var allFood = board.food;
-
-  console.log(gameData);
-
   var snakeHead = mySnake.head;
 
   var grid = boardToGrid(board);
@@ -37,7 +34,8 @@ function handleMove(request, response) {
     console.log("astar: ", result);
     console.log("snakehead: ", snakeHead);
     console.log("closest apple: ", closestApple);
-    if (result) {
+
+    if (result.length > 0) {
       const direction = findAdjacentDirection(snakeHead, result[0]);
       console.log("MOVE:", direction);
       response.status(200).send({ move: direction });

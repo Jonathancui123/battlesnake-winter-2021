@@ -76,13 +76,11 @@ const boardToGrid = (board) => {
   snakes.forEach((snake) => {
     const snakeBody = snake.body;
     snakeBody.forEach((occupiedCoordinate) => {
-      myGrid[occupiedCoordinate.x][
-        occupiedCoordinate.y
-      ] = 0;
+      myGrid[occupiedCoordinate.x][occupiedCoordinate.y] = 0;
     });
   });
 
-  console.log("**** MY GRID ****")
+  console.log("**** MY GRID ****");
   console.log(myGrid);
   return myGrid;
 };
@@ -97,7 +95,8 @@ const findAdjacentDirection = (source, destination) => {
     return "down";
   } else if (destination.x === source.x + 1 && destination.y === source.y) {
     return "right";
-  } else { // defaults to "left" if invalid inputs are not adjacent
+  } else {
+    // defaults to "left" if invalid inputs are not adjacent
     return "left";
   }
 };

@@ -82,7 +82,7 @@ const boardToGrid = (board) => {
     });
   });
 
-  console.log(myGrid);
+  return myGrid;
 };
 
 const directions = ["up", "down", "left", "right"];

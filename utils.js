@@ -76,12 +76,14 @@ const boardToGrid = (board) => {
   snakes.forEach((snake) => {
     const snakeBody = snake.body;
     snakeBody.forEach((occupiedCoordinate) => {
-      myGrid[board.width - 1 - occupiedCoordinate.x][
-        board.height - 1 - occupiedCoordinate.y
+      myGrid[occupiedCoordinate.x][
+        occupiedCoordinate.y
       ] = 0;
     });
   });
 
+  console.log("**** MY GRID ****")
+  console.log(myGrid);
   return myGrid;
 };
 

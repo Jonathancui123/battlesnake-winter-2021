@@ -7,12 +7,12 @@ const {
   directions,
   boardToGrid,
   findAdjacentDirection
-} = require("../utils");
+} = require("../utils/utils");
 
 const {
   astar,
   Graph
-} = require("../pathfinding")
+} = require("../utils/pathfinding")
 
 function handleMove(request, response) { 
   var gameData = request.body;

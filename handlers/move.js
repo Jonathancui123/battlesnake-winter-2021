@@ -6,6 +6,7 @@ const {
   adjacentTiles,
   directions,
   boardToGrid,
+  getAdjacentCoordinate,
   findAdjacentDirection
 } = require("../utils/utils");
 
@@ -111,14 +112,6 @@ const possibleImmediateMoves = (mySnakeHead, board) => {
     legals.up = false;
   }
 
-  // Coordinates that are adjacent to mySnakeHead, regardless of whether they are valid coordinates on the map (i.e. will include {x: -1, y: -1})
-  const anyAdjacents = {
-    up: up(mySnakeHead),
-    down: down(mySnakeHead),
-    left: left(mySnakeHead),
-    right: right(mySnakeHead),
-  };
-
   // don't run into snakes (including your own body)
   const snakes = board.snakes;
   snakes.forEach((snake) => {
@@ -126,8 +119,8 @@ const possibleImmediateMoves = (mySnakeHead, board) => {
     snakeBody.forEach((occupiedCoordinate) => {
       directions.forEach((direction) => {
         if (
-          occupiedCoordinate.x == anyAdjacents[direction].x &&
-          occupiedCoordinate.y == anyAdjacents[direction].y
+          occupiedCoordinate.x == getAdjacentCoordinate(mySnakeHead, direction).x &&
+          occupiedCoordinate.y == getAdjacentCoordinate(mySnakeHead, direction).y
         ) {
           legals[direction] = false;
         }

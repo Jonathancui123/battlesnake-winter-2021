@@ -101,6 +101,36 @@ const findAdjacentDirection = (source, destination) => {
   }
 };
 
+// Returns the adjacent coordinates object {x: ##, y:##} that is in a certain direction from the source
+const getAdjacentCoordinate = (source, directionString) => {
+  try {
+    if (directionString === "up") {
+      return up(source)
+    } else if (directionString === "left"){
+      return left(source)
+    } else if (directionString === "right"){
+      return right(source)
+    } else if (directionString === "down"){
+      return down(source)
+    } else {
+      // String was invalid
+      throw Error("invalid direction string")
+    }
+  } catch(e) {
+    console.error(e);
+    return source
+  }
+}
+
+// Given a coordinate, the board height, and board width, checks if out of bounds
+const coordinateOutOfBounds = ({x, y}, height, width) => {
+  if (x < 0 || y < 0 || x >= width || y >= height) {
+    return true
+  } else {
+    return false
+  }
+}
+
 module.exports = {
   up,
   down,
@@ -110,4 +140,6 @@ module.exports = {
   directions,
   boardToGrid,
   findAdjacentDirection,
+  getAdjacentCoordinate,
+  coordinateOutOfBounds
 };

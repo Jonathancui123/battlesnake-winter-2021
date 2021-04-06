@@ -131,6 +131,14 @@ const coordinateOutOfBounds = ({x, y}, height, width) => {
   }
 }
 
+// Returns true if coordinates are equal, false otherwise
+const coordinatesAreEqual = (coordinate1, coordinate2) => {
+  if (coordinate1.x === coordinate2.x && coordinate1.y === coordinate2.y){
+    return true;
+  }
+  return false;
+}
+
 module.exports = {
   up,
   down,
@@ -141,5 +149,6 @@ module.exports = {
   boardToGrid,
   findAdjacentDirection,
   getAdjacentCoordinate,
-  coordinateOutOfBounds
+  coordinateOutOfBounds,
+  coordinatesAreEqual
 };

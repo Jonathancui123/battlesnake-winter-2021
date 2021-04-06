@@ -5,14 +5,15 @@ const {
   right,
   directions,
   getAdjacentCoordinate,
-  coordinateOutOfBounds
+  coordinateOutOfBounds,
+  coordinatesAreEqual
 } = require('./utils')
 
 
 // TODO: Fix "off by one error"
 // Game object which represents the board: (explanation: https://www.w3schools.com/js/js_object_constructors.asp)
 // Supports methods for modifying the board, undoing modifications, and getting potential moves
-function Game(board) {
+function MinimaxGame(board) {
   this.board = board
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = []
@@ -79,10 +80,11 @@ const calcBestMove = function(depth, game, mySnakeID, otherSnakeID,
     value = evaluateBoard(game.board, mySnakeID, otherSnakeID);
     return [value, null]
   }
+
   // Base case 2: evaluate board when either snake is dead
-  if (gameOver(game.board, mySnakeID, otherSnakeID)){
-    value = evaluateBoard(game.board, mySnakeID, otherSnakeID);
-    return [value, null]
+  const gameOverValue = evaluateIfGameOver(game.board, mySnakeID, otherSnakeID);
+  if (gameOverValue) {
+    return [gameOverValue, null]
   }
   
   // clean up dead snakes and eaten food before proceeding with simulation
@@ -91,9 +93,11 @@ const calcBestMove = function(depth, game, mySnakeID, otherSnakeID,
   // Recursive case: search possible moves
   var bestMove = null; // best move not set yet
   var possibleMoves = directions
+
   // Set random order for possible moves
   // Optimize this later to try the highest value moves first for maximizingPlayer and the lowest value moves first for minimizing player
-  possibleMoves.sort(function(a, b){return 0.5 - Math.random()});
+  // possibleMoves.sort(function(a, b){return 0.5 - Math.random()});
+
   // Set a default best move value
   var bestMoveValue = isMaximizingPlayer ? Number.NEGATIVE_INFINITY
                                          : Number.POSITIVE_INFINITY;
@@ -139,40 +143,82 @@ const calcBestMove = function(depth, game, mySnakeID, otherSnakeID,
 }
 
 // Returns true if either of the two specified snakes should die from their current position
-const gameOver = (board, mySnakeID, otherSnakeID) => {
+const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
   const mySnake = board.snakes.find(snake => snake.id === mySnakeID);
   const otherSnake = board.snakes.find(snake => snake.id === otherSnakeID);
+  const mySnakeHead = mySnake.head;
+  const otherSnakeHead = otherSnake.head;
+
+  var mySnakeDead = false;
+  var otherSnakeDead = false;
 
   // my snake head or other snake head out of bounds
-  if(coordinateOutOfBounds(mySnake.head, board.height, board.width
-  || coordinateOutOfBounds(otherSnake.head, board.height, board.width)){
-    return true;
+  if(coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
+    mySnakeDead = true;
+  }
+  if (coordinateOutOfBounds(otherSnakeHead, board.height, board.width)){
+    otherSnakeDead = true;
   }
 
-  // my snake head collided with a snake
-  // TODO: CONTINUE HERE
-  // other snake head collided with a snake
-
-
-    // don't run into snakes (including your own body)
+  // Handle snake heads colliding with one another
+  if (coordinatesAreEqual(mySnakeHead, otherSnakeHead)){
+    if (mySnake.length === otherSnake.length) {
+      mySnakeDead = true
+      otherSnakeDead = true
+    } else if (mySnake.length > otherSnake.length){
+      otherSnakeDead = true
+    } else {
+      mySnakeDead = true
+    }
+  }
+  
+  // my snake head or other snake head collided with a snake:
+  // A snake head will have 1 coordinate equal to it in all the snake bodies coordinates (due to itself) if it is not colliding
+  // A snake head will have 2 coordinates equal to it in the snake bodies if it is colliding with something
+  var mySnakeHeadCollisions = 0;
+  var otherSnakeHeadCollisions = 0;
   const snakes = board.snakes;
   snakes.forEach((snake) => {
     const snakeBody = snake.body;
     snakeBody.forEach((occupiedCoordinate) => {
-      directions.forEach((direction) => {
-        if (
-          occupiedCoordinate.x == getAdjacentCoordinate(mySnakeHead, direction).x &&
-          occupiedCoordinate.y == getAdjacentCoordinate(mySnakeHead, direction).y
-        ) {
-          legals[direction] = false;
-        }
-      });
-    });
-  });
+      if (coordinatesAreEqual(occupiedCoordinate, mySnakeHead)){
+        mySnakeHeadCollisions++;
+      }
+      if (coordinatesAreEqual(occupiedCoordinate, otherSnakeHead)){
+        otherSnakeHeadCollisions++;
+      }
+    }); 
+  })
+  if (mySnakeHeadCollisions > 1){
+    mySnakeDead = true
+  }
+  if (mySnakeHeadCollisions > 1){
+    otherSnakeDead = true
+  }
+
+  if (mySnakeDead && otherSnakeDead) {
+    return 
+  } else if (mySnakeDead) {
+    return Number.NEGATIVE_INFINITY;
+  } else if (otherSnakeDead) {
+    return Number.POSITIVE_INFINITY;
+  } else {
+    return 0;
+  }
 }
 
 // Scores the given game board --> higher score if good for mySnake, lower if bad for mySnake
 const evaluateBoard = (board, mySnakeID) => { 
-  
-  return 0
+  const gameOverValue = evaluateIfGameOver;
+  if (gameOverValue){
+    return gameOverValue;
+  }
+
+  // Return a random value
+  return 0.5 - Math.random()
+}
+
+module.exports = {
+  calcBestMove,
+  MinimaxGame
 }

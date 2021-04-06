@@ -15,6 +15,11 @@ const {
   Graph
 } = require("../utils/pathfinding")
 
+const {
+  calcBestMove,
+  MinimaxGame
+} = require("../utils/minimax")
+
 function handleMove(request, response) { 
   var gameData = request.body;
   var mySnake = gameData.you;
@@ -25,6 +30,13 @@ function handleMove(request, response) {
   var grid = boardToGrid(board);
   const graph = new Graph(grid);
 
+  // test minimax implementation
+  // choose a random other snake
+  const otherSnake = board.snakes.find(anySnake => anySnake.id !== mySnake.id); 
+  const minimaxGameObj = MinimaxGame(board)
+  const move = calcBestMove(8, minimaxGameObj, mySnake.id, otherSnake.id)
+
+  /*
   const closestApple = findClosestApple(allFood, snakeHead);
 
   if (closestApple) {
@@ -46,7 +58,8 @@ function handleMove(request, response) {
 
   var possibleMoves = possibleImmediateMoves(mySnake.head, board);
   console.log("POSSIBLE:", possibleMoves);
-  var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]; 
+  */
 
   console.log("MOVE: " + move);
 

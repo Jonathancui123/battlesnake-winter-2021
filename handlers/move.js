@@ -7,23 +7,18 @@ const {
   directions,
   boardToGrid,
   getAdjacentCoordinate,
-  findAdjacentDirection
+  findAdjacentDirection,
 } = require("../utils/utils");
 
-const {
-  astar,
-  Graph
-} = require("../utils/pathfinding")
+const { astar, Graph } = require("../utils/pathfinding");
 
-const {
-  calcBestMove,
-  MinimaxGame
-} = require("../utils/minimax")
+const { calcBestMove, MinimaxGame } = require("../utils/minimax");
 
-function handleMove(request, response) { 
+function handleMove(request, response) {
   var gameData = request.body;
-  var mySnake = gameData.you;
-  var board = gameData.board;
+  const mySnake = gameData.you;
+  const board = gameData.board;
+  const turnNumber = gameData.board;
   var allFood = board.food;
   var snakeHead = mySnake.head;
 
@@ -32,9 +27,17 @@ function handleMove(request, response) {
 
   // test minimax implementation
   // choose a random other snake
-  const otherSnake = board.snakes.find(anySnake => anySnake.id !== mySnake.id); 
-  const minimaxGameObj = MinimaxGame(board)
-  const move = calcBestMove(5, minimaxGameObj, mySnake.id, otherSnake.id)[1]
+  const otherSnake = board.snakes.find(
+    (anySnake) => anySnake.id !== mySnake.id
+  );
+  const minimaxGameObj = MinimaxGame(board);
+  const move = calcBestMove(
+    5,
+    minimaxGameObj,
+    mySnake.id,
+    otherSnake.id,
+    turnNumber
+  )[1];
 
   /*
   const closestApple = findClosestApple(allFood, snakeHead);
@@ -132,8 +135,10 @@ const possibleImmediateMoves = (mySnakeHead, board) => {
     snakeBody.forEach((occupiedCoordinate) => {
       directions.forEach((direction) => {
         if (
-          occupiedCoordinate.x == getAdjacentCoordinate(mySnakeHead, direction).x &&
-          occupiedCoordinate.y == getAdjacentCoordinate(mySnakeHead, direction).y
+          occupiedCoordinate.x ==
+            getAdjacentCoordinate(mySnakeHead, direction).x &&
+          occupiedCoordinate.y ==
+            getAdjacentCoordinate(mySnakeHead, direction).y
         ) {
           legals[direction] = false;
         }

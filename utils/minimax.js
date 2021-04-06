@@ -171,7 +171,7 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
       mySnakeDead = true
     }
   }
-  console.log("New turn");
+
   // my snake head or other snake head collided with a snake:
   // A snake head will have 1 coordinate equal to it in all the snake bodies coordinates (due to itself) if it is not colliding
   // A snake head will have 2 coordinates equal to it in the snake bodies if it is colliding with something
@@ -183,7 +183,6 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
     snakeBody.forEach((occupiedCoordinate) => {
       if (coordinatesAreEqual(occupiedCoordinate, mySnakeHead)){
         mySnakeHeadCollisions++;
-        console.log(occupiedCoordinate);
       }
       if (coordinatesAreEqual(occupiedCoordinate, otherSnakeHead)){
         otherSnakeHeadCollisions++;
@@ -195,10 +194,6 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
   }
   if (mySnakeHeadCollisions > 1){
     otherSnakeDead = true
-  }
-
-  if(mySnakeDead){
-    console.log("my snake will die")
   }
 
   if (mySnakeDead && otherSnakeDead) {

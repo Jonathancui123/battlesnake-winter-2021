@@ -34,7 +34,7 @@ function handleMove(request, response) {
   // choose a random other snake
   const otherSnake = board.snakes.find(anySnake => anySnake.id !== mySnake.id); 
   const minimaxGameObj = MinimaxGame(board)
-  const move = calcBestMove(1, minimaxGameObj, mySnake.id, otherSnake.id)[1]
+  const move = calcBestMove(5, minimaxGameObj, mySnake.id, otherSnake.id)[1]
 
   /*
   const closestApple = findClosestApple(allFood, snakeHead);

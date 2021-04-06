@@ -69,6 +69,10 @@ function handleMove(request, response) {
   response.status(200).send({
     move: move,
   });
+
+  setTimeout(() => {
+    console.log("Logging this after request finished");
+  }, 2000);
 }
 
 // tested :D

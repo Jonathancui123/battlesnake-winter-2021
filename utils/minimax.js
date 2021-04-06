@@ -78,6 +78,7 @@ const calcBestMove = function (
   game,
   mySnakeID,
   otherSnakeID,
+  turnNumber,
   alpha = Number.NEGATIVE_INFINITY,
   beta = Number.POSITIVE_INFINITY,
   isMaximizingPlayer = true
@@ -124,6 +125,7 @@ const calcBestMove = function (
       game,
       mySnakeID,
       otherSnakeID,
+      turnNumber,
       alpha,
       beta,
       !isMaximizingPlayer

@@ -32,7 +32,7 @@ function handleMove(request, response) {
   );
   const minimaxGameObj = MinimaxGame(board);
   const move = calcBestMove(
-    5,
+    8,
     minimaxGameObj,
     mySnake.id,
     otherSnake.id,
@@ -70,9 +70,7 @@ function handleMove(request, response) {
     move: move,
   });
 
-  setTimeout(() => {
-    console.log("Logging this after request finished");
-  }, 2000);
+  // write minimax tree to logs
 }
 
 // tested :D
@@ -140,9 +138,9 @@ const possibleImmediateMoves = (mySnakeHead, board) => {
       directions.forEach((direction) => {
         if (
           occupiedCoordinate.x ==
-            getAdjacentCoordinate(mySnakeHead, direction).x &&
+          getAdjacentCoordinate(mySnakeHead, direction).x &&
           occupiedCoordinate.y ==
-            getAdjacentCoordinate(mySnakeHead, direction).y
+          getAdjacentCoordinate(mySnakeHead, direction).y
         ) {
           legals[direction] = false;
         }

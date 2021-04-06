@@ -3,7 +3,10 @@ const {
   getAdjacentCoordinate,
   coordinateOutOfBounds,
   coordinatesAreEqual,
+  boardToGrid
 } = require("./utils");
+
+const { astar, Graph } = require("./pathfinding");
 
 // TODO: Fix "off by one error"
 // Game object which represents the board: (explanation: https://www.w3schools.com/js/js_object_constructors.asp)
@@ -231,8 +234,19 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
   if (gameOverValue) {
     return gameOverValue;
   }
-  // Return a random value (should be the actual evaluation score of the board)
+  
+  // Some operations to simulate the time it would take to actually evaluate the board
+  var grid = boardToGrid(board);
+  const graph = new Graph(grid);
+  const start = graph.grid[0][0];
+  const end = graph.grid[8][8];
+  const result = astar.search(graph, start, end);
+  // console.log("astar: ", result);
+
+
   // TODO: Heuristic goes here
+
+  // Return a random value (should be the actual evaluation score of the board)
   return 0.5 - Math.random();
 };
 

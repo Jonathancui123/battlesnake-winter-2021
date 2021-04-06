@@ -80,8 +80,8 @@ const boardToGrid = (board) => {
     });
   });
 
-  console.log("**** MY GRID ****");
-  console.log(myGrid);
+  // console.log("**** MY GRID ****");
+  // console.log(myGrid);
   return myGrid;
 };
 
@@ -133,10 +133,10 @@ const coordinateOutOfBounds = ({x, y}, height, width) => {
 
 // Returns true if coordinates are equal, false otherwise
 const coordinatesAreEqual = (coordinate1, coordinate2) => {
-  if (coordinate1.x === coordinate2.x && coordinate1.y === coordinate2.y){
-    return true;
-  }
-  return false;
+
+
+
+  return coordinate1.x == coordinate2.x && coordinate1.y == coordinate2.y;
 }
 
 module.exports = {

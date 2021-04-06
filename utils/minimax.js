@@ -65,6 +65,7 @@ function MinimaxGame(board) {
       currentSnake.head = {...currentSnake.body[0]}; // copy of head (don't reference)
     }
   }
+  return this;
 }
 
 // depth: number of moves we want to continue looking forward
@@ -96,7 +97,7 @@ const calcBestMove = function(depth, game, mySnakeID, otherSnakeID,
 
   // Set random order for possible moves
   // Optimize this later to try the highest value moves first for maximizingPlayer and the lowest value moves first for minimizing player
-  // possibleMoves.sort(function(a, b){return 0.5 - Math.random()});
+  possibleMoves.sort(function(a, b){return 0.5 - Math.random()});
 
   // Set a default best move value
   var bestMoveValue = isMaximizingPlayer ? Number.NEGATIVE_INFINITY
@@ -112,8 +113,7 @@ const calcBestMove = function(depth, game, mySnakeID, otherSnakeID,
     // Recursively get the value from this move
     value = calcBestMove(depth-1, game, mySnakeID, otherSnakeID, alpha, beta, !isMaximizingPlayer)[0];
     // Log the value of this move
-    console.log(isMaximizingPlayer ? 'Max: ' : 'Min: ', depth, move, value,
-                bestMove, bestMoveValue);
+    // console.log(isMaximizingPlayer ? 'Max: ' : 'Min: ', depth, move, value, bestMove, bestMoveValue);
 
     if (isMaximizingPlayer) {
       // Look for moves that maximize position
@@ -134,7 +134,7 @@ const calcBestMove = function(depth, game, mySnakeID, otherSnakeID,
     game.undo();
     // Check for alpha beta pruning
     if (beta <= alpha) {
-      console.log('Prune', alpha, beta);
+      // console.log('Prune', alpha, beta);
       break;
     }
   }
@@ -171,7 +171,7 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
       mySnakeDead = true
     }
   }
-  
+  console.log("New turn");
   // my snake head or other snake head collided with a snake:
   // A snake head will have 1 coordinate equal to it in all the snake bodies coordinates (due to itself) if it is not colliding
   // A snake head will have 2 coordinates equal to it in the snake bodies if it is colliding with something
@@ -183,6 +183,7 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
     snakeBody.forEach((occupiedCoordinate) => {
       if (coordinatesAreEqual(occupiedCoordinate, mySnakeHead)){
         mySnakeHeadCollisions++;
+        console.log(occupiedCoordinate);
       }
       if (coordinatesAreEqual(occupiedCoordinate, otherSnakeHead)){
         otherSnakeHeadCollisions++;
@@ -196,29 +197,33 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
     otherSnakeDead = true
   }
 
+  if(mySnakeDead){
+    console.log("my snake will die")
+  }
+
   if (mySnakeDead && otherSnakeDead) {
-    return 
+    return -1000;
   } else if (mySnakeDead) {
-    return Number.NEGATIVE_INFINITY;
+    return -1000;
   } else if (otherSnakeDead) {
-    return Number.POSITIVE_INFINITY;
+    return 1000;
   } else {
     return 0;
   }
 }
 
 // Scores the given game board --> higher score if good for mySnake, lower if bad for mySnake
-const evaluateBoard = (board, mySnakeID) => { 
-  const gameOverValue = evaluateIfGameOver;
+const evaluateBoard = (board, mySnakeID, otherSnakeID) => { 
+  const gameOverValue = evaluateIfGameOver(board, mySnakeID, otherSnakeID);
   if (gameOverValue){
     return gameOverValue;
   }
-
-  // Return a random value
+  // Return a random value (should be the actual evaluation score of the board)
+  // TODO: Heuristic goes here
   return 0.5 - Math.random()
 }
 
 module.exports = {
   calcBestMove,
   MinimaxGame
-}
+} 

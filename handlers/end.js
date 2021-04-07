@@ -1,7 +1,7 @@
 function handleEnd(request, response) {
   var gameData = request.body;
 
-  console.log("END");
+  console.log(`END: ${gameData.game.id}`);
   response.status(200).send("ok");
 }
 

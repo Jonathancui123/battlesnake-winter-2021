@@ -17,7 +17,7 @@ const { calcBestMove, MinimaxGame } = require("../utils/minimax");
 const {MinimaxLogger} = require("../visualizer/minimaxLogger");
 
 // Logging adds computational overhead, turn on for development only.
-const USE_LOGGER = false;
+const USE_LOGGER = true;
 
 function handleMove(request, response) {
   var gameData = request.body;
@@ -36,6 +36,7 @@ function handleMove(request, response) {
   if (USE_LOGGER){
     // instantiate minimax logger
     logger = new MinimaxLogger(gameId, turnNumber);
+    logger.init();
   }
 
   // test minimax implementation
@@ -43,9 +44,9 @@ function handleMove(request, response) {
   const otherSnake = board.snakes.find(
     (anySnake) => anySnake.id !== mySnake.id
   );
-  const minimaxGameObj = MinimaxGame(board, logger);
+  const minimaxGameObj = MinimaxGame(board);
   const move = calcBestMove(
-    8,
+    4,
     minimaxGameObj,
     mySnake.id,
     otherSnake.id,
@@ -84,6 +85,9 @@ function handleMove(request, response) {
   });
 
   // write minimax tree to logs
+  if (logger){
+    logger.writeLogsToJson();
+  }
 }
 
 // tested :D

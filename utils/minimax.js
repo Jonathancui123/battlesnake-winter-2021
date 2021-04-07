@@ -11,10 +11,9 @@ const { astar, Graph } = require("./pathfinding");
 // TODO: Fix "off by one error"
 // Game object which represents the board: (explanation: https://www.w3schools.com/js/js_object_constructors.asp)
 // Supports methods for modifying the board, undoing modifications, and getting potential moves
-function MinimaxGame(board, logger=undefined) {
-  this.logger = logger;
+function MinimaxGame(board) {
 
-  // The state of the board at the current node of Minimax simulation
+  // The   state of the board at the current node of Minimax simulation
   this.board = board;
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = [];
@@ -45,7 +44,7 @@ function MinimaxGame(board, logger=undefined) {
       // TODO: food: describe food changes
     };
     this.changeHistory.push(newChange);
-    if (this.logger) {this.logger.logCurrentNode()};
+    
 
     // Modify the board object to reflect the changes
     currentSnake.head = newSnakeHeadCoordinate;
@@ -81,7 +80,7 @@ function MinimaxGame(board, logger=undefined) {
 // mySnakeID: the ID string of our own snake (so that minimax knows who to move)
 // otherSnakeID: the ID string of the opponent snake
 const calcBestMove = function (
-  depth,
+  remainingDepth,
   game,
   mySnakeID,
   otherSnakeID,
@@ -91,19 +90,28 @@ const calcBestMove = function (
   isMaximizingPlayer = true
 ) {
   // Base case: evaluate board at maximum depth
-  if (depth === 0) {
+  if (remainingDepth === 0) {
     value = evaluateBoard(game.board, mySnakeID, otherSnakeID);
+    if (logger){
+      logger.logCurrentNode({move: null, value})
+      logger.goToParent();
+    }
     return [value, null];
   }
 
   // Base case 2: evaluate board when either snake is dead
   const gameOverValue = evaluateIfGameOver(game.board, mySnakeID, otherSnakeID);
   if (gameOverValue) {
+    if (logger){
+      logger.logCurrentNode({move: null, value: gameOverValue})
+      logger.goToParent();
+    }
     return [gameOverValue, null];
   }
 
   // clean up dead snakes and eaten food before proceeding with simulation
   game.cleanupBoard();
+  // TODO: Log changes due to .cleanupBoard()
 
   // Recursive case: search possible moves
   var bestMove = null; // best move not set yet
@@ -126,9 +134,13 @@ const calcBestMove = function (
     var move = possibleMoves[i];
     // Make the move, but undo before exiting loop
     game.move(move, targetSnakeID);
+    
+    if (logger){
+      logger.goDeeper();
+    }
     // Recursively get the value from this move
     value = calcBestMove(
-      depth - 1,
+      remainingDepth - 1,
       game,
       mySnakeID,
       otherSnakeID,
@@ -160,8 +172,16 @@ const calcBestMove = function (
     // Check for alpha beta pruning
     if (beta <= alpha) {
       // console.log('Prune', alpha, beta);
+      if (logger){
+        logger.pruningAtCurrentNode();
+      }
       break;
     }
+  }
+
+  if (logger){
+    logger.logCurrentNode({move: bestMove, value: bestMoveValue})
+    logger.goToParent();
   }
 
   return [bestMoveValue, bestMove];

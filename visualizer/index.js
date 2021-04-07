@@ -8,9 +8,9 @@ app.get("/:gameId", (request, response) => {
   const { gameId } = request.params;
 
   if (!gameId) {
-    res.send("Enter a game ID into the URL to view the breakdown");
+    response.send("Enter a game ID into the URL to view the breakdown");
   } else {
-    res.sendFile(path.join(__dirname, "visualizer", "graph.html"));
+    response.sendFile(path.join(__dirname, "graph.html"));
   }
 });
 

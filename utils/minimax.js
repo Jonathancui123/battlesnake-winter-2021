@@ -11,7 +11,10 @@ const { astar, Graph } = require("./pathfinding");
 // TODO: Fix "off by one error"
 // Game object which represents the board: (explanation: https://www.w3schools.com/js/js_object_constructors.asp)
 // Supports methods for modifying the board, undoing modifications, and getting potential moves
-function MinimaxGame(board) {
+function MinimaxGame(board, logger=undefined) {
+  this.logger = logger;
+
+  // The state of the board at the current node of Minimax simulation
   this.board = board;
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = [];
@@ -42,6 +45,7 @@ function MinimaxGame(board) {
       // TODO: food: describe food changes
     };
     this.changeHistory.push(newChange);
+    if (this.logger) {this.logger.logCurrentNode()};
 
     // Modify the board object to reflect the changes
     currentSnake.head = newSnakeHeadCoordinate;
@@ -81,7 +85,7 @@ const calcBestMove = function (
   game,
   mySnakeID,
   otherSnakeID,
-  turnNumber,
+  logger = undefined,
   alpha = Number.NEGATIVE_INFINITY,
   beta = Number.POSITIVE_INFINITY,
   isMaximizingPlayer = true
@@ -128,7 +132,7 @@ const calcBestMove = function (
       game,
       mySnakeID,
       otherSnakeID,
-      turnNumber,
+      logger,
       alpha,
       beta,
       !isMaximizingPlayer
@@ -236,11 +240,13 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
   }
   
   // Some operations to simulate the time it would take to actually evaluate the board
+  /*
   var grid = boardToGrid(board);
   const graph = new Graph(grid);
   const start = graph.grid[0][0];
   const end = graph.grid[8][8];
   const result = astar.search(graph, start, end);
+  */
   // console.log("astar: ", result);
 
 

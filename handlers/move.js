@@ -14,29 +14,42 @@ const { astar, Graph } = require("../utils/pathfinding");
 
 const { calcBestMove, MinimaxGame } = require("../utils/minimax");
 
+const {MinimaxLogger} = require("../visualizer/minimaxLogger");
+
+// Logging adds computational overhead, turn on for development only.
+const USE_LOGGER = false;
+
 function handleMove(request, response) {
   var gameData = request.body;
   const mySnake = gameData.you;
   const board = gameData.board;
-  const turnNumber = gameData.board;
+  const turnNumber = gameData.turn;
+  const gameId = gameData.game.id;
+  
   var allFood = board.food;
   var snakeHead = mySnake.head;
 
   var grid = boardToGrid(board);
   const graph = new Graph(grid);
 
+  let logger = undefined;
+  if (USE_LOGGER){
+    // instantiate minimax logger
+    logger = new MinimaxLogger(gameId, turnNumber);
+  }
+
   // test minimax implementation
   // choose a random other snake
   const otherSnake = board.snakes.find(
     (anySnake) => anySnake.id !== mySnake.id
   );
-  const minimaxGameObj = MinimaxGame(board);
+  const minimaxGameObj = MinimaxGame(board, logger);
   const move = calcBestMove(
     8,
     minimaxGameObj,
     mySnake.id,
     otherSnake.id,
-    turnNumber
+    logger
   )[1];
 
   /*

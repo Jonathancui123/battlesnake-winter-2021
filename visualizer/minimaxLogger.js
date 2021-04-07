@@ -1,5 +1,5 @@
 // Used by the minimax algorithm to output game logs
-const {writeFileSync, statSync, readFileSync} = require('fs');
+const {writeFileSync, statSync, readFileSync, existsSync, mkdirSync} = require('fs');
 const path = require("path");
 
 // Stores the data necessary for the visualizer to represent this node in a graph
@@ -9,10 +9,12 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber){
   }
   this.key = minimaxLoggerNode.nodeId
 
-  const newTurnNumber = loggerTurnNumber + Math.floor(minimaxLoggerNode.depth / 2);
-  const isMaximizingPlayer = !Boolean(minimaxLoggerNode.depth % 2) // our turn will be on even node depth
+  const newTurnNumber = loggerTurnNumber + Math.floor(minimaxLoggerNode.nodeDepth / 2);
+  const isMaximizingPlayer = !Boolean(minimaxLoggerNode.nodeDepth % 2) // our turn will be on even node depth
   const our_their = isMaximizingPlayer ? "OUR" : "THEIR";
-  this.name = `Turn ${newTurnNumber}, ${isMaximizingPlayer ? "Ours" : "Theirs"}`;
+  const their_our = isMaximizingPlayer ?  "THEIR" : "OUR";
+  const whose_move = minimaxLoggerNode.data.move ? (isMaximizingPlayer ? "our move" : "their move"): "no move"
+  this.name = `Turn ${newTurnNumber}, ${whose_move}`;
 
   // Colours var for the 
   var colors = {
@@ -30,7 +32,7 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber){
   this.items = [];
   if(minimaxLoggerNode.previousMove){
     this.items.push({
-      item: `If ${our_their} snake moved ${minimaxLoggerNode.previousMove.toUpperCase()}:`,
+      item: `If ${their_our} snake moved ${minimaxLoggerNode.previousMove.toUpperCase()}:`,
       iskey: true,
       figure: "",
       fill: "",
@@ -49,7 +51,7 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber){
   } else if(minimaxLoggerNode.data.gameOver) {
     // Game over leaf node
     this.items.push({
-      item: `The game is over.`,
+      item: `The game is over with`,
       iskey: false,
       figure: "Circle",
       fill: colors.red,
@@ -58,7 +60,7 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber){
   } else {
     // Max depth leaf node
         this.items.push({
-      item: `The game is over.`,
+      item: `The game is evaluated at`,
       iskey: false,
       figure: "",
       fill: "",
@@ -125,7 +127,7 @@ function MinimaxLogger(gameId, turnNumber){
     const newNodeChildNumber = String(this.currentNode.childCount);
 
     this.currentNode.childCount++;
-    this.currentNode = new MinimaxLoggerNode(this.nodeStack.length, newNodeChildNumber, newNodeParentId);
+    this.currentNode = new MinimaxLoggerNode(this.nodeStack.length, newNodeChildNumber, newNodeParentId, previousMove);
 
     // push new node to nodeStack
     this.nodeStack.push(this.currentNode);
@@ -165,6 +167,11 @@ function MinimaxLogger(gameId, turnNumber){
 
   // Writes the logged data to a json file after a response has been given to Battlesnake game server
   this.writeLogsToJson = function() {
+    const folderpath = path.join(__dirname, `logs`);
+    if (!existsSync(folderpath)){
+      mkdirSync(folderpath);
+    }
+
     const filepath = path.join(__dirname, `logs`, `${this.gameId}.json`)
     try { 
       statSync(filepath) // Will throw if the file doesn't exist

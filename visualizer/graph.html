@@ -30,19 +30,19 @@
       var itemTempl = $(
         go.Panel,
         "Horizontal",
-        $(
-          go.Shape,
-          {
-            desiredSize: new go.Size(15, 15),
-            strokeJoin: "round",
-            strokeWidth: 3,
-            stroke: null,
-            margin: 2,
-          },
-          new go.Binding("figure", "figure"),
-          new go.Binding("fill", "color"),
-          new go.Binding("stroke", "color")
-        ),
+        // $(
+        //   go.Shape,
+        //   {
+        //     desiredSize: new go.Size(15, 15),
+        //     strokeJoin: "round",
+        //     strokeWidth: 3,
+        //     stroke: null,
+        //     margin: 2,
+        //   },
+        //   new go.Binding("figure", "figure"),
+        //   new go.Binding("fill", "color"),
+        //   new go.Binding("stroke", "color")
+        // ),
         $(
           go.TextBlock,
           {
@@ -56,20 +56,25 @@
       // the template we defined earlier
       myDiagram.nodeTemplate = $(
         go.Node,
-        "Horizontal",
-        { background: "#44CCFF" },
+        "Auto",
+        {
+          background: "#FFFFFF" },
         // $(go.Picture,
         //   { margin: 10, width: 50, height: 50, background: "red" },
         //   new go.Binding("source")),
         $(
           go.TextBlock,
           "Default Text",
-          { margin: 12, stroke: "white", font: "bold 16px sans-serif" },
+          { margin: 12, stroke: "blue", font: "bold 16px sans-serif" },
           new go.Binding("text", "name")
         ),
-        // $(go.TextBlock, "Default Text 2",
-        //   { margin: 12, stroke: "white", font: "12px sans-serif" },
-        //   new go.Binding("text", "body")),
+        $(go.Panel, "Table",
+          { margin: 8, stretch: go.GraphObject.Fill },
+          $(go.RowColumnDefinition, { row: 0, sizing: go.RowColumnDefinition.None }),
+          // the collapse/expand button
+          $("PanelExpanderButton", "LIST",  // the name of the element whose visibility this button toggles
+            { row: 0, alignment: go.Spot.TopRight }),
+          // the list of Panels, each showing an attribute
         $(
           go.Panel,
           "Vertical",
@@ -83,6 +88,7 @@
             itemTemplate: itemTempl,
           },
           new go.Binding("itemArray", "items")
+        )
         )
       );
 

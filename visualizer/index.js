@@ -1,6 +1,7 @@
+// serve an html file which will help visualize a minimax tree
 const path = require("path");
 const express = require("express");
-const {readFileSync} = require('fs')
+const {readFileSync, readdirSync, statSync} = require('fs')
 
 const PORT = process.env.PORT || 3000;
 
@@ -32,8 +33,29 @@ app.get("/:gameId", (request, response) => {
 
 app.get("/", (request, response) => {
   console.log("GET: /")
-  response.send("Enter a game ID into the URL path to view the breakdown");
+
+  // most recently created file
+  let mostRecentFile = undefined;
+  let latestCtime = "2021-03-07T05:36:33.582Z";
+
+  const list = readdirSync(path.join(__dirname, "logs"))
+  list.forEach(function(file){
+    //  console.log(file);
+      stats = statSync(path.join(__dirname, "logs", file));
+      if (stats.ctime.toString() > latestCtime){
+        latestCtime = stats.ctime.toString();
+        mostRecentFile = file
+      }
+  })
+  
+  
+
+  const gameId = mostRecentFile.split('.')[0]
+  console.log("Redirecting to ")
+  console.log(`***  ${mostRecentFile} ***`);
+  response.redirect(`${request.baseUrl}/${gameId}`);
 })
+
 
 
 app.listen(PORT, () =>

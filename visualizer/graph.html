@@ -12,6 +12,9 @@
      style="width:100vw; height:100vh; background-color: #DAE4E4;"></div>
   
   <script>
+    // Change this number and refresh your page to see a diffferent turn
+    const TURN_NUMBER = 1;
+
     var $ = go.GraphObject.make;
 var myDiagram =
   $(go.Diagram, "myDiagramDiv",
@@ -25,9 +28,9 @@ var myDiagram =
 myDiagram.nodeTemplate =
   $(go.Node, "Horizontal",
     { background: "#44CCFF" },
-    $(go.Picture,
-      { margin: 10, width: 50, height: 50, background: "red" },
-      new go.Binding("source")),
+    // $(go.Picture,
+    //   { margin: 10, width: 50, height: 50, background: "red" },
+    //   new go.Binding("source")),
     $(go.TextBlock, "Default Text",
       { margin: 12, stroke: "white", font: "bold 16px sans-serif" },
       new go.Binding("text", "name")),
@@ -37,8 +40,6 @@ myDiagram.nodeTemplate =
   );
 
 var model = $(go.TreeModel);
-
-<!-- Retrieve the game data file -->
 
 const gameId = `${window.location.pathname.substring(1)}`;
 const resourceUrl = `data/${gameId}`; 
@@ -51,7 +52,8 @@ fetch(resourceUrl)
   }).then((responseBody) => {
     console.log(responseBody) 
     // TODO: implement handling for visualizing different turns
-    model.nodeDataArray = responseBody.turn_1;
+    const turnNumberString = `turn_${TURN_NUMBER}`
+    model.nodeDataArray = responseBody[turnNumberString];
     myDiagram.model = model;
   })
   .catch((err) => {

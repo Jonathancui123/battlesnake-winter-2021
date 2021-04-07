@@ -3,17 +3,79 @@ const {writeFileSync, statSync, readFileSync} = require('fs');
 const path = require("path");
 
 // Stores the data necessary for the visualizer to represent this node in a graph
-function VisualizerNode(minimaxLoggerNode){
+function VisualizerNode(minimaxLoggerNode, loggerTurnNumber){
   if (minimaxLoggerNode.parentId){
     this.parent = minimaxLoggerNode.parentId;
   }
   this.key = minimaxLoggerNode.nodeId
-  this.name = minimaxLoggerNode.nodeId;
-  this.body = `Move: ${minimaxLoggerNode.data.move}, Value: ${minimaxLoggerNode.data.value}`
+
+  const newTurnNumber = loggerTurnNumber + Math.floor(minimaxLoggerNode.depth / 2);
+  const isMaximizingPlayer = !Boolean(minimaxLoggerNode.depth % 2) // our turn will be on even node depth
+  const our_their = isMaximizingPlayer ? "OUR" : "THEIR";
+  this.name = `Turn ${newTurnNumber}, ${isMaximizingPlayer ? "Ours" : "Theirs"}`;
+
+  // Colours var for the 
+  var colors = {
+  'red': '#be4b15',
+  'green': '#52ce60',
+  'blue': '#6ea5f8',
+  'lightred': '#fd8852',
+  'lightblue': '#afd4fe',
+  'lightgreen': '#b9e986',
+  'pink': '#faadc1',
+  'purple': '#d689ff',
+  'orange': '#fdb400',
+  }
+
+  this.items = [];
+  if(minimaxLoggerNode.previousMove){
+    this.items.push({
+      item: `If ${our_their} snake moved ${minimaxLoggerNode.previousMove.toUpperCase()}:`,
+      iskey: true,
+      figure: "",
+      fill: "",
+      stroke: ""
+  })
+  }
+  if (minimaxLoggerNode.data.move){
+    // Not a leaf node
+    this.items.push({
+      item: `${our_their} snake will move ${minimaxLoggerNode.data.move.toUpperCase()}:`,
+      iskey: false,
+      figure: "",
+      fill: "",
+      stroke: ""
+    })
+  } else if(minimaxLoggerNode.data.gameOver) {
+    // Game over leaf node
+    this.items.push({
+      item: `The game is over.`,
+      iskey: false,
+      figure: "Circle",
+      fill: colors.red,
+      stroke: colors.red
+    })
+  } else {
+    // Max depth leaf node
+        this.items.push({
+      item: `The game is over.`,
+      iskey: false,
+      figure: "",
+      fill: "",
+      stroke: ""
+    })
+  }
+  this.items.push({
+    item: `Value: ${minimaxLoggerNode.data.value}:`,
+    iskey: false,
+    figure: "",
+    fill: "",
+    stroke: ""
+  })
 }
 
 // Stores the data for a node (a game board state) in the minimax tree
-function MinimaxLoggerNode(childNumber='0', parentId=undefined){
+function MinimaxLoggerNode(depth, childNumber='0', parentId=undefined, previousMove=undefined){
   // To create a unique nodeId, we concatenate the childNumber onto the parentId string
   if (parentId !== undefined){ // parentId is only undefined for the root node
     this.parentId = String(parentId);
@@ -21,7 +83,13 @@ function MinimaxLoggerNode(childNumber='0', parentId=undefined){
   } else {
     this.nodeId = '0';
   }
+
+  if (previousMove){
+    this.previousMove = previousMove;
+  }
   
+  this.nodeDepth = depth;
+
   this.childCount = 0;
 
   this.data = {}
@@ -45,19 +113,19 @@ function MinimaxLogger(gameId, turnNumber){
   this.finishedNodes = []
 
   this.init = function() {
-    this.currentNode = new MinimaxLoggerNode();
+    this.currentNode = new MinimaxLoggerNode(0);
     this.nodeStack.push(this.currentNode);
   }
 
   // Step one level deeper in the simulation than before
-  this.goDeeper = function() {
+  this.goDeeper = function(previousMove) {
 
     // create a new child node and set it as the new currentNode    
     const newNodeParentId = this.currentNode.nodeId;
     const newNodeChildNumber = String(this.currentNode.childCount);
 
     this.currentNode.childCount++;
-    this.currentNode = new MinimaxLoggerNode(newNodeChildNumber, newNodeParentId);
+    this.currentNode = new MinimaxLoggerNode(this.nodeStack.length, newNodeChildNumber, newNodeParentId);
 
     // push new node to nodeStack
     this.nodeStack.push(this.currentNode);
@@ -76,7 +144,7 @@ function MinimaxLogger(gameId, turnNumber){
     }
 
     // We will never return to this node, commit it's contents to the finishedNodes
-    const newVisualizerNode = new VisualizerNode(newFinishedNode)
+    const newVisualizerNode = new VisualizerNode(newFinishedNode, turnNumber)
     this.finishedNodes.push(newVisualizerNode);
 
     return

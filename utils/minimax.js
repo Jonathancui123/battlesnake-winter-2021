@@ -13,27 +13,32 @@ const { astar, Graph } = require("./pathfinding");
 // Supports methods for modifying the board, undoing modifications, and getting potential moves
 function MinimaxGame(board) {
 
-  // The   state of the board at the current node of Minimax simulation
+  // The state of the board at the current node of Minimax simulation
+  // Battlesnake API board object
   this.board = board;
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = [];
+
+  this.stagedChange = {};
+
   // Commit the move to our move history and update this.board
   // move: the direction (string) in which the snake will move
   // snakeID: the snake which is being moved
-  this.move = function (moveDirection, snakeID) {
+  this.move = function (moveDirection, snakeID, applyChange) {
     // TODO: Account for food getting eaten --> remove food from board, grow the snake
 
     // Find the snake to move
     const currentSnake = this.board.snakes.find(
       (snake) => snake.id === snakeID
     );
+
     const snakeHeadCoordinate = currentSnake.head;
     const newSnakeHeadCoordinate = getAdjacentCoordinate(
       snakeHeadCoordinate,
       moveDirection
     );
     const snakeTailCoordinate = currentSnake.body[currentSnake.body.length - 1];
-
+		
     // Create an object that describes the changes to the board on this move
     const newChange = {
       snake: {
@@ -43,13 +48,34 @@ function MinimaxGame(board) {
       },
       // TODO: food: describe food changes
     };
-    this.changeHistory.push(newChange);
     
+		this.changeHistory.push(newChange);
 
+		if (applyChange) {
+
+			// apply current snake's move
+			currentSnake.head = newSnakeHeadCoordinate;
+    	currentSnake.body.unshift(newSnakeHeadCoordinate);
+    	currentSnake.body.pop();
+
+			// apply staged snake's move
+			const stagedSnake = this.board.snakes.find(
+				(snake) => snake.id === stagedChange.snake.id
+			);
+			const stagedSnakeHead = stagedChange.snake.newHeadPosition;
+			stagedSnake.head = stagedSnakeHead;
+    	stagedSnake.body.unshift(stagedSnakeHead);
+    	stagedSnake.body.pop();
+
+		} else {
+			this.stagedChange = newChange;
+		}
+
+    // 'currentSnake' object is referencing an object in "this.board"
     // Modify the board object to reflect the changes
-    currentSnake.head = newSnakeHeadCoordinate;
-    currentSnake.body.unshift(newSnakeHeadCoordinate);
-    currentSnake.body.pop();
+    // currentSnake.head = newSnakeHeadCoordinate;
+    // currentSnake.body.unshift(newSnakeHeadCoordinate);
+    // currentSnake.body.pop();
   };
 
   // Cleanup dead snakes and eaten food from the board, commit it to history
@@ -68,11 +94,12 @@ function MinimaxGame(board) {
 
       // Opposite order of modifications made in move() method
       currentSnake.body.push(lastChange.snake.prevTailPosition);
-      currentSnake.body.shift();
+      currentSnake.body.shift(); // .shift() gets rid of the first element of an array
       currentSnake.head = { ...currentSnake.body[0] }; // copy of head (don't reference)
+      
     }
   };
-  return this;
+
 }
 
 // depth: number of moves we want to continue looking forward
@@ -98,16 +125,23 @@ const calcBestMove = function (
     }
     return [value, null];
   }
-
+  
   // Base case 2: evaluate board when either snake is dead
-  const gameOverValue = evaluateIfGameOver(game.board, mySnakeID, otherSnakeID);
-  if (gameOverValue) {
-    if (logger){
-      logger.logCurrentNode({move: null, value: gameOverValue})
-      logger.goToParent();
+  // Note: should only evalute when it is our turn (takes 2 moves for a turn), so only
+  // when maximizing player is true
+  if (isMaximizingPlayer) {
+
+
+    const gameOverValue = evaluateIfGameOver(game.board, mySnakeID, otherSnakeID);
+    if (gameOverValue) {
+      if (logger){
+        logger.logCurrentNode({move: null, value: gameOverValue, gameOver: true})
+        logger.goToParent();
+      }
+      return [gameOverValue, null];
     }
-    return [gameOverValue, null];
   }
+  
 
   // clean up dead snakes and eaten food before proceeding with simulation
   game.cleanupBoard();
@@ -136,7 +170,7 @@ const calcBestMove = function (
     game.move(move, targetSnakeID);
     
     if (logger){
-      logger.goDeeper();
+      logger.goDeeper(move);
     }
     // Recursively get the value from this move
     value = calcBestMove(

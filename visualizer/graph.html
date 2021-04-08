@@ -15,7 +15,7 @@
 
     <script>
       // Change this number and refresh your page to see a diffferent turn
-      const TURN_NUMBER = 2;
+      const TURN_NUMBER = 7;
 
       var $ = go.GraphObject.make;
       var myDiagram = $(go.Diagram, "myDiagramDiv", {
@@ -112,6 +112,7 @@
         })
         .catch((err) => {
           console.error(err);
+          window.alert("Turn number not found.. or some other error?");
         });
     </script>
   </body>

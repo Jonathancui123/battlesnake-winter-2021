@@ -15,30 +15,26 @@ function MinimaxGame(board) {
 
   // The state of the board at the current node of Minimax simulation
   // Battlesnake API board object
-  this.board = board;
+ this.board = board;
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = [];
-
-  this.stagedChange = {};
-
   // Commit the move to our move history and update this.board
   // move: the direction (string) in which the snake will move
   // snakeID: the snake which is being moved
-  this.move = function (moveDirection, snakeID, applyChange) {
+  this.move = function (moveDirection, snakeID) {
     // TODO: Account for food getting eaten --> remove food from board, grow the snake
 
     // Find the snake to move
     const currentSnake = this.board.snakes.find(
       (snake) => snake.id === snakeID
     );
-
     const snakeHeadCoordinate = currentSnake.head;
     const newSnakeHeadCoordinate = getAdjacentCoordinate(
       snakeHeadCoordinate,
       moveDirection
     );
     const snakeTailCoordinate = currentSnake.body[currentSnake.body.length - 1];
-		
+
     // Create an object that describes the changes to the board on this move
     const newChange = {
       snake: {
@@ -51,31 +47,11 @@ function MinimaxGame(board) {
     
 		this.changeHistory.push(newChange);
 
-		if (applyChange) {
-
-			// apply current snake's move
-			currentSnake.head = newSnakeHeadCoordinate;
-    	currentSnake.body.unshift(newSnakeHeadCoordinate);
-    	currentSnake.body.pop();
-
-			// apply staged snake's move
-			const stagedSnake = this.board.snakes.find(
-				(snake) => snake.id === stagedChange.snake.id
-			);
-			const stagedSnakeHead = stagedChange.snake.newHeadPosition;
-			stagedSnake.head = stagedSnakeHead;
-    	stagedSnake.body.unshift(stagedSnakeHead);
-    	stagedSnake.body.pop();
-
-		} else {
-			this.stagedChange = newChange;
-		}
-
     // 'currentSnake' object is referencing an object in "this.board"
     // Modify the board object to reflect the changes
-    // currentSnake.head = newSnakeHeadCoordinate;
-    // currentSnake.body.unshift(newSnakeHeadCoordinate);
-    // currentSnake.body.pop();
+    currentSnake.head = newSnakeHeadCoordinate;
+    currentSnake.body.unshift(newSnakeHeadCoordinate);
+    currentSnake.body.pop();
   };
 
   // Cleanup dead snakes and eaten food from the board, commit it to history

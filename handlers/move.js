@@ -6,24 +6,58 @@ const {
   adjacentTiles,
   directions,
   boardToGrid,
-  findAdjacentDirection
-} = require("../utils");
+  getAdjacentCoordinate,
+  findAdjacentDirection,
+} = require("../utils/utils");
 
-const {
-  astar,
-  Graph
-} = require("../pathfinding")
+const { astar, Graph } = require("../utils/pathfinding");
 
-function handleMove(request, response) { 
+const { calcBestMove, MinimaxGame } = require("../utils/minimax");
+
+const {MinimaxLogger} = require("../visualizer/minimaxLogger");
+
+// Logging adds computational overhead, turn on for development only.
+const USE_LOGGER = true;
+
+// How many moves to simulate
+// Two moves (one from each snake) is one "turn" in the game. e.g. MINIMAX_DEPTH=2 means that we will only simulate the immediate turn
+const MINIMAX_DEPTH = 2;
+
+function handleMove(request, response) {
   var gameData = request.body;
-  var mySnake = gameData.you;
-  var board = gameData.board;
+  const mySnake = gameData.you;
+  const board = gameData.board;
+  const turnNumber = gameData.turn;
+  const gameId = gameData.game.id;
+  
   var allFood = board.food;
   var snakeHead = mySnake.head;
 
   var grid = boardToGrid(board);
   const graph = new Graph(grid);
 
+  let logger = undefined;
+  if (USE_LOGGER){
+    // instantiate minimax logger
+    logger = new MinimaxLogger(gameId, turnNumber);
+    logger.init();
+  }
+
+  // test minimax implementation
+  // choose a random other snake
+  const otherSnake = board.snakes.find(
+    (anySnake) => anySnake.id !== mySnake.id
+  );
+  const minimaxGameObj = new MinimaxGame(board);
+  const move = calcBestMove(
+    MINIMAX_DEPTH,
+    minimaxGameObj,
+    mySnake.id,
+    otherSnake.id,
+    logger  
+  )[1];
+
+  /*
   const closestApple = findClosestApple(allFood, snakeHead);
 
   if (closestApple) {
@@ -45,13 +79,19 @@ function handleMove(request, response) {
 
   var possibleMoves = possibleImmediateMoves(mySnake.head, board);
   console.log("POSSIBLE:", possibleMoves);
-  var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]; 
+  */
 
   console.log("MOVE: " + move);
 
   response.status(200).send({
     move: move,
   });
+
+  // write minimax tree to logs
+  if (logger){
+    logger.writeLogsToJson();
+  }
 }
 
 // tested :D
@@ -111,14 +151,6 @@ const possibleImmediateMoves = (mySnakeHead, board) => {
     legals.up = false;
   }
 
-  // Coordinates that are adjacent to mySnakeHead, regardless of whether they are valid coordinates on the map (i.e. will include {x: -1, y: -1})
-  const anyAdjacents = {
-    up: up(mySnakeHead),
-    down: down(mySnakeHead),
-    left: left(mySnakeHead),
-    right: right(mySnakeHead),
-  };
-
   // don't run into snakes (including your own body)
   const snakes = board.snakes;
   snakes.forEach((snake) => {
@@ -126,8 +158,10 @@ const possibleImmediateMoves = (mySnakeHead, board) => {
     snakeBody.forEach((occupiedCoordinate) => {
       directions.forEach((direction) => {
         if (
-          occupiedCoordinate.x == anyAdjacents[direction].x &&
-          occupiedCoordinate.y == anyAdjacents[direction].y
+          occupiedCoordinate.x ==
+          getAdjacentCoordinate(mySnakeHead, direction).x &&
+          occupiedCoordinate.y ==
+          getAdjacentCoordinate(mySnakeHead, direction).y
         ) {
           legals[direction] = false;
         }

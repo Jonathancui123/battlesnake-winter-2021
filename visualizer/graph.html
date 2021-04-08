@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!-- HTML5 document type -->
+<html>
+  <head>
+    <!-- use go-debug.js when developing and go.js when deploying -->
+    <script src="https://unpkg.com/gojs/release/go-debug.js"></script>
+  </head>
+  <body>
+    <!-- The DIV for a Diagram needs an explicit size or else we will not see anything.
+     In this case we also add a background color so we can see that area. -->
+    <div
+      id="myDiagramDiv"
+      style="width: 100vw; height: 100vh; background-color: #dae4e4"
+    ></div>
+
+    <script>
+      // Change this number and refresh your page to see a diffferent turn
+      const TURN_NUMBER = 2;
+
+      var $ = go.GraphObject.make;
+      var myDiagram = $(go.Diagram, "myDiagramDiv", {
+        "undoManager.isEnabled": true,
+        layout: $(
+          go.TreeLayout, // specify a Diagram.layout that arranges trees
+          { angle: 90, layerSpacing: 35 }
+        ),
+      });
+
+      // the template for each attribute in a node's array of item data
+      var itemTempl = $(
+        go.Panel,
+        "Horizontal",
+        // $(
+        //   go.Shape,
+        //   {
+        //     desiredSize: new go.Size(15, 15),
+        //     strokeJoin: "round",
+        //     strokeWidth: 3,
+        //     stroke: null,
+        //     margin: 2,
+        //   },
+        //   new go.Binding("figure", "figure"),
+        //   new go.Binding("fill", "color"),
+        //   new go.Binding("stroke", "color")
+        // ),
+        $(
+          go.TextBlock,
+          {
+            stroke: "#333333",
+            font: "bold 14px sans-serif",
+          },
+          new go.Binding("text", "item")
+        )
+      );
+
+      // the template we defined earlier
+      myDiagram.nodeTemplate = $(
+        go.Node,
+        "Auto",
+        {
+          background: "#FFFFFF" },
+        // $(go.Picture,
+        //   { margin: 10, width: 50, height: 50, background: "red" },
+        //   new go.Binding("source")),
+        $(
+          go.TextBlock,
+          "Default Text",
+          { margin: 12, stroke: "blue", font: "bold 16px sans-serif" },
+          new go.Binding("text", "name")
+        ),
+        $(go.Panel, "Table",
+          { margin: 8, stretch: go.GraphObject.Fill },
+          $(go.RowColumnDefinition, { row: 0, sizing: go.RowColumnDefinition.None }),
+          // the collapse/expand button
+          $("PanelExpanderButton", "LIST",  // the name of the element whose visibility this button toggles
+            { row: 0, alignment: go.Spot.TopRight }),
+          // the list of Panels, each showing an attribute
+        $(
+          go.Panel,
+          "Vertical",
+          {
+            name: "LIST",
+            row: 1,
+            padding: 3,
+            alignment: go.Spot.TopLeft,
+            defaultAlignment: go.Spot.Left,
+            stretch: go.GraphObject.Horizontal,
+            itemTemplate: itemTempl,
+          },
+          new go.Binding("itemArray", "items")
+        )
+        )
+      );
+
+      var model = $(go.TreeModel);
+
+      const gameId = `${window.location.pathname.substring(1)}`;
+      const resourceUrl = `data/${gameId}`;
+
+      console.log(resourceUrl);
+      fetch(resourceUrl)
+        .then((response) => {
+          console.log(response);
+          return response.json();
+        })
+        .then((responseBody) => {
+          console.log(responseBody);
+          // TODO: implement handling for visualizing different turns
+          const turnNumberString = `turn_${TURN_NUMBER}`;
+          model.nodeDataArray = responseBody[turnNumberString];
+          myDiagram.model = model;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    </script>
+  </body>
+</html>

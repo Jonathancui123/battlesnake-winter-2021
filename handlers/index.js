@@ -2,10 +2,11 @@ function handleIndex(request, response) {
   var battlesnakeInfo = {
     apiversion: "1",
     author: "POOOOOOOOOOOOOG",
-    color: "#FF00FF",
+    color: "#ff00ff",
     head: "gamer",
     tail: "weight",
   };
+  console.log("INDEX")
   response.status(200).json(battlesnakeInfo);
 }
 

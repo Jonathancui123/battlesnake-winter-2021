@@ -125,7 +125,7 @@ const calcBestMove = function (
 
   // Recursive case: search possible moves
   var bestMove = null; // best move not set yet
-  var possibleMoves = directions;
+  var possibleMoves = [...directions];
 
   // Set random order for possible moves
   // Optimize this later to try the highest value moves first for maximizingPlayer and the lowest value moves first for minimizing player

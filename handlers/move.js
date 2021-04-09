@@ -21,19 +21,22 @@ const { calcBestMove, MinimaxGame } = require("../utils/minimax");
 
 const {MinimaxLogger} = require("../visualizer/minimaxLogger");
 
-// Logging adds computational overhead, turn on for development only.
-const USE_LOGGER = true;
+
 
 // How many moves to simulate
 // Two moves (one from each snake) is one "turn" in the game. e.g. MINIMAX_DEPTH=2 means that we will only simulate the immediate turn
-const MINIMAX_DEPTH = 2;
+const MINIMAX_DEPTH = 4;
 
 function handleMove(request, response) {
+
   var gameData = request.body;
   const mySnake = gameData.you;
   const board = gameData.board;
   const turnNumber = gameData.turn;
   const gameId = gameData.game.id;
+
+    // Logging adds computational overhead, turn on for development only.
+  const USE_LOGGER = true;
   const numSnakes = board.snakes.length;
   
   var allFood = board.food;

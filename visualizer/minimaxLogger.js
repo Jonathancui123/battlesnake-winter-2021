@@ -2,6 +2,8 @@
 const {writeFileSync, statSync, readFileSync, existsSync, mkdirSync} = require('fs');
 const path = require("path");
 
+const LOGGER_TURNS_TO_KEEP = 30
+
 // Stores the data necessary for the visualizer to represent this node in a graph
 function VisualizerNode(minimaxLoggerNode, loggerTurnNumber){
   if (minimaxLoggerNode.parentId){
@@ -27,7 +29,7 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber){
   'pink': '#faadc1',
   'purple': '#d689ff',
   'orange': '#fdb400',
-  }
+  }   
 
   this.items = [];
   if(minimaxLoggerNode.previousMove){
@@ -176,12 +178,18 @@ function MinimaxLogger(gameId, turnNumber){
     try { 
       statSync(filepath) // Will throw if the file doesn't exist
       // some other turn, file already exists
+      if (this.turnNumber % LOGGER_TURNS_TO_KEEP == 0){
+        // Reset the log file for this game every LOGGER_TURNS_TO_KEEP turns 
+        console.log(this.turnNumber);
+         throw "Logs full"
+      } 
       const jsonFile = readFileSync(filepath);
       const jsonObject = JSON.parse(jsonFile);
       jsonObject[`turn_${this.turnNumber}`] = this.finishedNodes;
       const newJsonFile = JSON.stringify(jsonObject);
       writeFileSync(filepath, newJsonFile);
-    } catch { // first turn, file doesn't exist yet
+      
+    } catch { // first turn of the game, file doesn't exist yet
       const newJsonObject = {}
       newJsonObject[`turn_${this.turnNumber}`] = this.finishedNodes;
       const newJsonFile = JSON.stringify(newJsonObject);

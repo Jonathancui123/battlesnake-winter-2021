@@ -282,6 +282,11 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
 
   // TODO: Heuristic goes here
 
+	// food heuristic
+	// threshold: <= 40 health -> go for food
+
+
+
   // Return a random value (should be the actual evaluation score of the board)
   return 0.5 - Math.random();
 };

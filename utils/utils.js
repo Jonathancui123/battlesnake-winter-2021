@@ -15,7 +15,6 @@ const right = ({ x, y }) => {
 };
 
 // adjacentTiles takes position and board dimensions and returns adjacent tiles.
-// confirmed!
 const adjacentTiles = ({ x, y }, height, width) => {
   tileList = [];
 
@@ -101,6 +100,47 @@ const findAdjacentDirection = (source, destination) => {
   }
 };
 
+const distance = (source, dest) => {
+  distance = Math.pow(source.x - dest.x, 2) + Math.pow(source.y - dest.y, 2);
+}
+
+const distanceToClosestCorner = (source, board) => {
+	width = board.width;
+	shortestDistance = 100000;
+	currDistance = 0;
+	closestCorner = {x: 0, y: 0};
+
+	// check topRight
+	currDistance = Math.pow(source.x - width, 2) + Math.pow(source.y - width, 2);
+	if (currDistance < shortestDistance) {
+		closestCorner = {x: width, y: width};
+		shortestDistance = currDistance;
+	}
+
+	// check topLeft
+	currDistance = Math.pow(source.x, 2) + Math.pow(source.y - width, 2);
+	if (currDistance < shortestDistance) {
+		closestCorner = {x: 0, y: width};
+		shortestDistance = currDistance;
+	}
+
+	// check bottomLeft
+	currDistance = Math.pow(source.x, 2) + Math.pow(source.y, 2);
+	if (currDistance < shortestDistance) {
+		closestCorner = {x: 0, y: 0};
+		shortestDistance = currDistance;
+	}
+
+	// check bottomRight
+	currDistance = Math.pow(source.x - width, 2) + Math.pow(source.y, 2);
+	if (currDistance < shortestDistance) {
+		closestCorner = {x: width, y: 0};
+		shortestDistance = currDistance;
+	}
+
+	return shortestDistance;
+}
+
 // Returns the adjacent coordinates object {x: ##, y:##} that is in a certain direction from the source
 const getAdjacentCoordinate = (source, directionString) => {
   try {
@@ -133,9 +173,6 @@ const coordinateOutOfBounds = ({x, y}, height, width) => {
 
 // Returns true if coordinates are equal, false otherwise
 const coordinatesAreEqual = (coordinate1, coordinate2) => {
-
-
-
   return coordinate1.x == coordinate2.x && coordinate1.y == coordinate2.y;
 }
 

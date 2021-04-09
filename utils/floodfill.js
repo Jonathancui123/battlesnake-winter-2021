@@ -9,6 +9,7 @@
 row = [1, -1, 0, 0];
 col = [0, 0, 1, -1];
 
+// TODO: implement hashmap
 const floodfill = (board, x, y) => {
   grid = board;
   count = 0;
@@ -26,7 +27,6 @@ const floodfill = (board, x, y) => {
         }
       }
     }
-    grid[newX][newY] = 0
   }
   return count;
 }
@@ -45,3 +45,7 @@ const isSafe = (board, x, y) => {
 
 
 // console.log(floodfill(testgrid, 2, 2));
+
+module.exports = {
+  floodfill
+};

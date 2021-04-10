@@ -97,14 +97,13 @@ function handleMove(request, response) {
     
     // Check if there is sufficient space for the snake to go for each move. Remove if insufficient.
     const safeMovesFromHeadOnAndFloodfill = [];
-    
-    console.log("Iterating ", safeMovesFromHeadOnDeath.length);
+
+    // Stop after floodfill counts this many tiles open tiles (runtime optimization)
+    const maxFloodfillCount = mySnake.length * 2;
     var i;
     for (i = 0; i < safeMovesFromHeadOnDeath.length; i++) {
-      console.log("beep");
       spotToFloodFill = getAdjacentCoordinate(mySnake.head, safeMovesFromHeadOnDeath[i])
-      console.log(spotToFloodFill);
-      numSpaces = floodfill(grid, spotToFloodFill.x, spotToFloodFill.y);
+      numSpaces = floodfill(grid, spotToFloodFill.x, spotToFloodFill.y, maxFloodfillCount);
       console.log(numSpaces);
       if (numSpaces > mySnake.length * 1.5) {
         safeMovesFromHeadOnAndFloodfill.push(safeMovesFromHeadOnDeath[i]);

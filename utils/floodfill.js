@@ -10,7 +10,7 @@ row = [1, -1, 0, 0];
 col = [0, 0, 1, -1];
 
 // TODO: implement hashmap
-const floodfill = (board, x, y) => {
+const floodfill = (board, x, y, maxFloodfillCount) => {
   grid = board;
   count = 0;
   visited = {};
@@ -22,6 +22,9 @@ const floodfill = (board, x, y) => {
     newY = poppedNode[1]
     if(grid[newX][newY] == 1 && !visited[JSON.stringify(newX) + "," + JSON.stringify(newY)]) {
       count++;
+      if (count >= maxFloodfillCount){
+        return count;
+      }
       visited[JSON.stringify(newX) + "," + JSON.stringify(newY)] = true
       for(i = 0; i < 4; i++) {
         if (isSafe(grid, newX + row[i], newY + col[i])){

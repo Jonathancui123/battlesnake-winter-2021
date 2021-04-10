@@ -203,7 +203,7 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
   const mySnakeHead = mySnake.head;
   const otherSnakeHead = otherSnake.head;
-  const headOnCollision = false;
+  let headOnCollision = false;
 
   var mySnakeDead = false;
   var otherSnakeDead = false;

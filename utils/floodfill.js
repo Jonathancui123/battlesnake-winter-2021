@@ -13,14 +13,16 @@ col = [0, 0, 1, -1];
 const floodfill = (board, x, y) => {
   grid = board;
   count = 0;
+  visited = {};
   let q = [];
   q.push([x, y]);
   while(q.length != 0) {
     poppedNode = q.shift();
     newX = poppedNode[0]
     newY = poppedNode[1]
-    if(grid[newX][newY] == 1) {
+    if(grid[newX][newY] == 1 && !visited[JSON.stringify(newX) + "," + JSON.stringify(newY)]) {
       count++;
+      visited[JSON.stringify(newX) + "," + JSON.stringify(newY)] = true
       for(i = 0; i < 4; i++) {
         if (isSafe(grid, newX + row[i], newY + col[i])){
           q.push([newX + row[i], newY + col[i]]);
@@ -35,16 +37,16 @@ const isSafe = (board, x, y) => {
   return 0 <= x && x < board.length && 0 <= y && y < board.length && board[x][y] == 1;
 }
 
-// testgrid = [
-//   [0, 1, 1, 1, 0],
-//   [1, 0, 0, 1, 1],
-//   [1, 1, 1, 0, 1],
-//   [1, 1, 1, 0, 1],
-//   [0, 0, 0, 1, 1]
-// ]
+testgrid = [
+  [0, 1, 1, 1, 0],
+  [1, 0, 0, 1, 1],
+  [1, 1, 1, 0, 1],
+  [1, 1, 1, 0, 1],
+  [0, 0, 0, 1, 1]
+]
 
 
-// console.log(floodfill(testgrid, 2, 2));
+console.log(floodfill(testgrid, 2, 2));
 
 module.exports = {
   floodfill

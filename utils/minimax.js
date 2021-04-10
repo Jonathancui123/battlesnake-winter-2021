@@ -203,6 +203,7 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
   const mySnakeHead = mySnake.head;
   const otherSnakeHead = otherSnake.head;
+  const headOnCollision = false;
 
   var mySnakeDead = false;
   var otherSnakeDead = false;
@@ -217,6 +218,7 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
 
   // Handle snake heads colliding with one another
   if (coordinatesAreEqual(mySnakeHead, otherSnakeHead)) {
+    headOnCollision = true;
     if (mySnake.length === otherSnake.length) {
       mySnakeDead = true;
       otherSnakeDead = true;
@@ -244,12 +246,16 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
       }
     });
   });
-  if (mySnakeHeadCollisions > 1) {
-    mySnakeDead = true;
+
+  if (!headOnCollision) {
+    if (mySnakeHeadCollisions > 1) {
+      mySnakeDead = true;
+    }
+    if (mySnakeHeadCollisions > 1) {
+      otherSnakeDead = true;
+    }
   }
-  if (mySnakeHeadCollisions > 1) {
-    otherSnakeDead = true;
-  }
+  
 
   if (mySnakeDead && otherSnakeDead) {
     return -1000;

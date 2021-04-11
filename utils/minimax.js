@@ -15,7 +15,8 @@ function MinimaxGame(board) {
 
   // The state of the board at the current node of Minimax simulation
   // Battlesnake API board object
- this.board = board;
+  this.board = board;
+  this.grid = boardToGrid(board)
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = [];
   // Commit the move to our move history and update this.board
@@ -35,6 +36,8 @@ function MinimaxGame(board) {
     );
     const snakeTailCoordinate = currentSnake.body[currentSnake.body.length - 1];
 
+    
+
     // Create an object that describes the changes to the board on this move
     const newChange = {
       snake: {
@@ -44,9 +47,14 @@ function MinimaxGame(board) {
       },
       // TODO: food: describe food changes
     };
-    
-		this.changeHistory.push(newChange);
 
+    // Grid Changes for floodFill
+    // TODO: undo function for grid, account for food changes
+
+    grid[newHeadPosition.x][newHeadPosition.y] = 0
+    grid[prevTailPosition.x][prevTailPosition.y] = 1
+
+		this.changeHistory.push(newChange);
     // 'currentSnake' object is referencing an object in "this.board"
     // Modify the board object to reflect the changes
     currentSnake.head = newSnakeHeadCoordinate;
@@ -67,6 +75,10 @@ function MinimaxGame(board) {
       const currentSnake = this.board.snakes.find(
         (snake) => snake.id === lastChange.snake.id
       );
+
+      // Adjustment for grid floodfill
+      grid[newHeadPosition.x][newHeadPosition.y] = 1
+      grid[prevTailPosition.x][prevTailPosition.y] = 0
 
       // Opposite order of modifications made in move() method
       currentSnake.body.push(lastChange.snake.prevTailPosition);

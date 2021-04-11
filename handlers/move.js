@@ -104,7 +104,6 @@ function handleMove(request, response) {
     for (i = 0; i < safeMovesFromHeadOnDeath.length; i++) {
       spotToFloodFill = getAdjacentCoordinate(mySnake.head, safeMovesFromHeadOnDeath[i])
       numSpaces = floodfill(grid, spotToFloodFill.x, spotToFloodFill.y, maxFloodfillCount);
-      console.log(numSpaces);
       if (numSpaces > mySnake.length * 1.5) {
         safeMovesFromHeadOnAndFloodfill.push(safeMovesFromHeadOnDeath[i]);
       }

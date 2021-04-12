@@ -27,6 +27,7 @@ const {MinimaxLogger} = require("../visualizer/minimaxLogger");
 // How many moves to simulate
 // Two moves (one from each snake) is one "turn" in the game. e.g. MINIMAX_DEPTH=2 means that we will only simulate the immediate turn
 const MINIMAX_DEPTH = 8;
+const USE_LOGGER = false;
 
 function handleMove(request, response) {
 
@@ -37,7 +38,7 @@ function handleMove(request, response) {
   const gameId = gameData.game.id;
 
     // Logging adds computational overhead, turn on for development only.
-  const USE_LOGGER = false;
+  
   const numSnakes = board.snakes.length;
   
   var allFood = board.food;
@@ -69,13 +70,14 @@ function handleMove(request, response) {
       minimaxGameObj,
       mySnake.id,
       otherSnake.id,
+      MINIMAX_DEPTH,
       logger  
     )[1];
   } else {
     // Use "logic" snake
     const closestApple = findClosestApple(allFood, snakeHead);
 
-    if (closestApple && mySnake.length > 10) {
+    if (closestApple && mySnake.length <= 10) {
       const start = graph.grid[snakeHead.x][snakeHead.y];
       const end = graph.grid[closestApple.x][closestApple.y];
       const result = astar.search(graph, start, end);

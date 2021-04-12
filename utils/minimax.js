@@ -318,10 +318,11 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
 	const mySnakeHead = mySnake.head;
 	const otherSnakeHead = otherSnake.head;
+  const maxDistance = Math.pow(board.width, 2) + Math.pow(board.width, 2);
 
 	// if snake is hungry, the closer the snake to food the better
-  const mySnakeLength = mySnake.
-	if (mySnake.health <= 40) {
+  const mySnakeLength = mySnake.length;
+	if (mySnake.health <= 40 || (mySnake.length < otherSnake.length + 2)) {
 		closestAppleDistance = Math.pow(mySnakeHead.x - findClosestApple.x, 2) + Math.pow(mySnakeHead.y - findClosestApple.y, 2);
 		score += closestAppleDistance; // heuristic score can be adjusted later
 	}
@@ -344,10 +345,10 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
 		y = board.width - mySnakeHead.y;
 	}
 
-	score += Math.min(x, y);
+	score += Math.min(x, y) + 10;
 
 	// check distance of enemy head from corner
-	score += distanceToClosestCorner(otherSnakeHead, board);
+	score += maxDistance - distanceToClosestCorner(otherSnakeHead, board);
 
 	return score;
   // When the enemy snake is close to the edge, attempt to get closer to 

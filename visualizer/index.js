@@ -22,7 +22,7 @@ app.get("/data/:gameId", (request, response) => {
     console.error(e);
     response.send(e);
   }
-})
+})  
 
 app.get("/:gameId", (request, response) => {
   console.log("GET: /:gameId")

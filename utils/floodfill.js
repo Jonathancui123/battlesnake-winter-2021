@@ -43,13 +43,13 @@ const isSafe = (board, x, y) => {
 testgrid = [
   [0, 1, 1, 1, 0],
   [1, 0, 0, 1, 1],
-  [1, 1, 1, 0, 1],
+  [1, 1, 1, 0, 0],
   [1, 1, 1, 0, 1],
   [0, 0, 0, 1, 1]
 ]
 
 
-// console.log(floodfill(testgrid, 2, 2));
+console.log(floodfill(testgrid, 3, 4));
 
 module.exports = {
   floodfill

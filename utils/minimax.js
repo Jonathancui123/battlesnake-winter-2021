@@ -119,7 +119,7 @@ const calcBestMove = function (
 ) {
   // Base case: evaluate board at maximum depth
   if (remainingDepth === 0) {
-    value = evaluateBoard(game.board, mySnakeID, otherSnakeID, game.grid, MINIMAX_DEPTH);
+    value = evaluateBoard(game.board, mySnakeID, otherSnakeID, game.grid, MINIMAX_DEPTH, remainingDepth);
     if (logger){
       logger.logCurrentNode({move: null, value})
       logger.goToParent();
@@ -133,7 +133,7 @@ const calcBestMove = function (
   if (isMaximizingPlayer) {
 
 
-    const gameOverValue = evaluateIfGameOver(game.board, mySnakeID, otherSnakeID, MINIMAX_DEPTH);
+    const gameOverValue = evaluateIfGameOver(game.board, mySnakeID, otherSnakeID, MINIMAX_DEPTH, remainingDepth);
     if (gameOverValue) {
       if (logger){
         logger.logCurrentNode({move: null, value: gameOverValue, gameOver: true})
@@ -224,7 +224,7 @@ const calcBestMove = function (
 };
 
 // Returns true if either of the two specified snakes should die from their current position
-const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, MINIMAX_DEPTH) => {
+const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, MINIMAX_DEPTH, remainingDepth) => {
   const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
   const mySnakeHead = mySnake.head;
@@ -282,36 +282,42 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, MINIMAX_DEPTH) => {
       mySnakeMaybeDead = true;
     }
     if (mySnakeHeadCollisions > 1) {
+      // remember to do this
+      console.log(mySnakeHeadCollisions)
       otherSnakeDead = true;
     }
   }
   
-  /* const 
-    
-  */
+
+  
+  const UNCERTAINTY_FACTOR = 0.87
+  const adjustForFutureUncertainty = (score) => {
+    // return score* (UNCERTAINTY_FACTOR**(MINIMAX_DEPTH - remainingDepth))
+    return score;
+  }
 
   if (mySnakeDead) {
-    return -1000;
+    return adjustForFutureUncertainty(-1000);
 	} else if (mySnakeMaybeDead) {
-		return -500;
+		return adjustForFutureUncertainty(-500);
   } else if (otherSnakeMaybeDead) {
-    return 500;
+    return adjustForFutureUncertainty(500);
   } else if (otherSnakeDead) {
-    return 1000;
+    return adjustForFutureUncertainty(1000);
   } else {
-    return 0;
+    return adjustForFutureUncertainty(0);
   }
 };
 
 // Scores the given game board --> higher score if good for mySnake, lower if bad for mySnake
-const evaluateBoard = (board, mySnakeID, otherSnakeID, grid, MINIMAX_DEPTH) => {
+const evaluateBoard = (board, mySnakeID, otherSnakeID, grid, MINIMAX_DEPTH, remainingDepth) => {
 	// range = [-1000, 1000]
 	// score will only be negative if it might die
 	var score = 0;
 
 	// gameOverValue is -500 if mySnake might die
 	// gameOverValue is -1000 if mySnake will for sure die
-  const gameOverValue = evaluateIfGameOver(board, mySnakeID, otherSnakeID, MINIMAX_DEPTH);
+  const gameOverValue = evaluateIfGameOver(board, mySnakeID, otherSnakeID, MINIMAX_DEPTH, remainingDepth);
 	if (gameOverValue) {
   	score += gameOverValue;
 	}
@@ -320,19 +326,27 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID, grid, MINIMAX_DEPTH) => {
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
 	const mySnakeHead = mySnake.head;
 	const otherSnakeHead = otherSnake.head;
-  const maxDistance = Math.pow(board.width, 2) + Math.pow(board.width, 2);
+  const MAX_DISTANCE = board.width + board.height;
+  const MAX_HEALTH = 100;
 
 	// if snake is hungry, the closer the snake to food the better
   const mySnakeLength = mySnake.length;
-	if (mySnake.health <= 40 || (mySnake.length < otherSnake.length + 2)) {
-		closestAppleDistance = Math.pow(mySnakeHead.x - findClosestApple.x, 2) + Math.pow(mySnakeHead.y - findClosestApple.y, 2);
-		score += closestAppleDistance; // heuristic score can be adjusted later
+  const closestApple = findClosestApple(board.food, mySnakeHead);
+	if (mySnake.health <= 40 || (mySnakeLength < otherSnake.length + 2 && mySnakeLength < 15)) {
+		const closestAppleDistance = Math.abs(mySnakeHead.x - closestApple.x) + Math.abs(mySnakeHead.y - closestApple.y);
+    
+    const foodScore = ((MAX_DISTANCE - closestAppleDistance)/4)**2 + ((MAX_HEALTH - mySnake.health)/5)**2
+    console.log(foodScore);
+    score += foodScore; // heuristic score can be adjusted later
 	}
+
+  let cavernSize;
 
   // floodfill heuristic
   if(!coordinateOutOfBounds(mySnakeHead,board.height, board.width)){
     grid[mySnakeHead.x][mySnakeHead.y] = 1;
     cavernSize = floodfill(grid, mySnakeHead.x, mySnakeHead.y, mySnakeLength * 2);
+    console.log("cavernSize for "+ mySnakeHead.x +", "+ mySnakeHead.y + ":" +cavernSize);
     grid[mySnakeHead.x][mySnakeHead.y] = 0;
   }
 
@@ -362,8 +376,9 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID, grid, MINIMAX_DEPTH) => {
 
 	score += Math.min(x, y) * 10 + 10;
 
+
 	// check distance of enemy head from corner
-	score += maxDistance - distanceToClosestCorner(otherSnakeHead, board);
+	score += MAX_DISTANCE - distanceToClosestCorner(otherSnakeHead, board);
 
 	return score;
   // When the enemy snake is close to the edge, attempt to get closer to 

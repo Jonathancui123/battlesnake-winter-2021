@@ -286,9 +286,6 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, MINIMAX_DEPTH) => {
     }
   }
   
-  /* const 
-    
-  */
 
   if (mySnakeDead) {
     return -1000;
@@ -305,6 +302,8 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, MINIMAX_DEPTH) => {
 
 // Scores the given game board --> higher score if good for mySnake, lower if bad for mySnake
 const evaluateBoard = (board, mySnakeID, otherSnakeID, grid, MINIMAX_DEPTH) => {
+	// HEURISTICS!!!!
+
 	// range = [-1000, 1000]
 	// score will only be negative if it might die
 	var score = 0;
@@ -330,12 +329,9 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID, grid, MINIMAX_DEPTH) => {
 	}
 
   // floodfill heuristic
-  if(!coordinateOutOfBounds(mySnakeHead,board.height, board.width)){
-    grid[mySnakeHead.x][mySnakeHead.y] = 1;
-    cavernSize = floodfill(grid, mySnakeHead.x, mySnakeHead.y, mySnakeLength * 2);
-    grid[mySnakeHead.x][mySnakeHead.y] = 0;
-  }
-
+  grid[mySnakeHead.x][mySnakeHead.y] = 1;
+  cavernSize = floodfill(grid, mySnakeHead.x, mySnakeHead.y, mySnakeLength * 2);
+  grid[mySnakeHead.x][mySnakeHead.y] = 0;
 
   if (cavernSize <= mySnakeLength) {
     score = -1000;

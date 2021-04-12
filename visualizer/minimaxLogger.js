@@ -2,7 +2,7 @@
 const {writeFileSync, statSync, readFileSync, existsSync, mkdirSync} = require('fs');
 const path = require("path");
 
-const LOGGER_TURNS_TO_KEEP = 30
+const {LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE} = require("../constants");
 
 // Stores the data necessary for the visualizer to represent this node in a graph
 function VisualizerNode(minimaxLoggerNode, loggerTurnNumber){
@@ -178,7 +178,7 @@ function MinimaxLogger(gameId, turnNumber){
     try { 
       statSync(filepath) // Will throw if the file doesn't exist
       // some other turn, file already exists
-      if (this.turnNumber % LOGGER_TURNS_TO_KEEP == 0){
+      if (this.turnNumber % LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE == 0){
         // Reset the log file for this game every LOGGER_TURNS_TO_KEEP turns 
         console.log(this.turnNumber);
          throw "Logs full"

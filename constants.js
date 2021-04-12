@@ -3,6 +3,7 @@
 module.exports = {
   // Logger
   USE_LOGGER : true,
+  LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE: 30,
   // How many moves to simulate
   // Two moves (one from each snake) is one "turn" in the game. e.g. MINIMAX_DEPTH=2 means that we will only simulate the immediate turn
   MINIMAX_DEPTH : 4,

@@ -104,6 +104,7 @@ const distance = (source, dest) => {
   distance = Math.pow(source.x - dest.x, 2) + Math.pow(source.y - dest.y, 2);
 }
 
+// TODO: determine if we want to keep track of closestCorner
 const distanceToClosestCorner = (source, board) => {
 	width = board.width;
 	shortestDistance = 100000;
@@ -176,6 +177,26 @@ const coordinatesAreEqual = (coordinate1, coordinate2) => {
   return coordinate1.x == coordinate2.x && coordinate1.y == coordinate2.y;
 }
 
+const findClosestApple = (allFood, { x, y }) => {
+  shortestDistance = 100000;
+  closestApple = { x, y };
+  currDistance = 0;
+
+  if (allFood.length === 0) {
+    return undefined;
+  }
+
+  for (i = 0; i < allFood.length; i++) {
+    currDistance =
+      Math.pow(x - allFood[i].x, 2) + Math.pow(y - allFood[i].y, 2);
+    if (currDistance < shortestDistance) {
+      closestApple = allFood[i];
+      shortestDistance = currDistance;
+    }
+  }
+  return closestApple;
+};
+
 module.exports = {
   up,
   down,
@@ -187,5 +208,7 @@ module.exports = {
   findAdjacentDirection,
   getAdjacentCoordinate,
   coordinateOutOfBounds,
-  coordinatesAreEqual
+  coordinatesAreEqual,
+	findClosestApple,
+	distanceToClosestCorner
 };

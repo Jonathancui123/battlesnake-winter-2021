@@ -8,7 +8,8 @@ const {
   boardToGrid,
   getAdjacentCoordinate,
   findAdjacentDirection,
-  coordinatesAreEqual
+  coordinatesAreEqual,
+	findClosestApple
 } = require("../utils/utils");
 
 const { 
@@ -138,40 +139,6 @@ function handleMove(request, response) {
     logger.writeLogsToJson();
   }
 }
-
-// tested :D
-const findClosestApple = (allFood, { x, y }) => {
-  shortestDistance = 100000;
-  closestApple = { x, y };
-  currDistance = 0;
-
-  if (allFood.length === 0) {
-    return undefined;
-  }
-
-  for (i = 0; i < allFood.length; i++) {
-    currDistance =
-      Math.pow(x - allFood[i].x, 2) + Math.pow(y - allFood[i].y, 2);
-    if (currDistance < shortestDistance) {
-      closestApple = allFood[i];
-      shortestDistance = currDistance;
-    }
-  }
-  return closestApple;
-};
-
-// appleArr = [
-//   { x: 1, y: 100 },
-//   { x: 2, y: 50 },
-//   { x: 3, y: 4 },
-//   { x: 3, y: 6 },
-//   { x: 4, y: 4 },
-// ];
-
-// console.log(findClosestApple(appleArr, { x: 5, y: 5 }));
-
-// findClosestApple
-// legalMoves --> don't (immediately) run into body, wall, or other snake
 
 const possibleImmediateMoves = (mySnakeHead, board) => {
   // Mark each direction as illegal when an obstacle is seen

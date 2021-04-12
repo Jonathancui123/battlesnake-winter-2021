@@ -3,7 +3,9 @@ const {
   getAdjacentCoordinate,
   coordinateOutOfBounds,
   coordinatesAreEqual,
-  boardToGrid
+  boardToGrid,
+	findClosestApple,
+	distanceToClosestCorner
 } = require("./utils");
 
 const { astar, Graph } = require("./pathfinding");
@@ -16,7 +18,7 @@ function MinimaxGame(board) {
   // The state of the board at the current node of Minimax simulation
   // Battlesnake API board object
   this.board = board;
-  this.grid = boardToGrid(board)
+  this.grid = boardToGrid(board);
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = [];
   // Commit the move to our move history and update this.board
@@ -50,9 +52,8 @@ function MinimaxGame(board) {
 
     // Grid Changes for floodFill
     // TODO: undo function for grid, account for food changes
-
-    grid[newHeadPosition.x][newHeadPosition.y] = 0
-    grid[prevTailPosition.x][prevTailPosition.y] = 1
+    this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y] = 0;
+    this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
 
 		this.changeHistory.push(newChange);
     // 'currentSnake' object is referencing an object in "this.board"
@@ -77,8 +78,8 @@ function MinimaxGame(board) {
       );
 
       // Adjustment for grid floodfill
-      grid[newHeadPosition.x][newHeadPosition.y] = 1
-      grid[prevTailPosition.x][prevTailPosition.y] = 0
+      this.grid[lastChange.snake.newHeadPosition.x][lastChange.snake.newHeadPosition.y] = 1
+      this.grid[lastChange.snake.prevTailPosition.x][lastChange.snake.prevTailPosition.y] = 0
 
       // Opposite order of modifications made in move() method
       currentSnake.body.push(lastChange.snake.prevTailPosition);
@@ -282,9 +283,12 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
 
 // Scores the given game board --> higher score if good for mySnake, lower if bad for mySnake
 const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
+	// range = [0, 100] unless the snake will 100% die
+	var score = 0;
+
   const gameOverValue = evaluateIfGameOver(board, mySnakeID, otherSnakeID);
   if (gameOverValue) {
-    return gameOverValue;
+    return -1000;
   }
   
   // Some operations to simulate the time it would take to actually evaluate the board
@@ -299,14 +303,46 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
 
 
   // TODO: Heuristic goes here
+	const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
+  const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
+	const mySnakeHead = mySnake.head;
+	const otherSnakeHead = otherSnake.head;
 
-	// food heuristic
-	// threshold: <= 40 health -> go for food
+	// if snake is hungry, the closer the snake to food the better
+	if (mySnake.health <= 40) {
+		closestAppleDistance = Math.pow(mySnakeHead.x - findClosestApple.x, 2) + Math.pow(mySnakeHead.y - findClosestApple.y, 2);
+		score += closestAppleDistance; // heuristic score can be adjusted later
+	}
 
+	// the further from the edge the better
+	// add the minimum distance between the x and y distance
+	const distanceFromEdge = 0;
+	var x = 0;
+	var y = 0;
 
+	if (mySnakeHead.x < board.width / 2) {
+		x = mySnakeHead.x;
+	} else {
+		x = board.width - mySnakeHead.x;
+	}
 
+	if (mySnakeHead.y < board.width / 2) {
+		y = mySnakeHead.y;
+	} else {
+		y = board.width - mySnakeHead.y;
+	}
+
+	score += Math.min(x, y);
+
+	// check distance of enemy head from corner
+	score += distanceToClosestCorner(otherSnakeHead, board);
+
+	return score;
+  // When the enemy snake is close to the edge, attempt to get closer to 
+  // their head (blocks their path). Keep in mind to avoid moves that may lead to death.
+	
   // Return a random value (should be the actual evaluation score of the board)
-  return 0.5 - Math.random();
+  // return 0.5 - Math.random();
 };
 
 module.exports = {

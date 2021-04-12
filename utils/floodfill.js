@@ -49,7 +49,7 @@ testgrid = [
 ]
 
 
-console.log(floodfill(testgrid, 2, 2));
+// console.log(floodfill(testgrid, 2, 2));
 
 module.exports = {
   floodfill

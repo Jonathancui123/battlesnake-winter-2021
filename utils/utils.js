@@ -68,8 +68,8 @@ const adjacentTiles = ({ x, y }, height, width) => {
 
 const boardToGrid = (board) => {
   var value = 1; // by default
-  var myGrid = [...Array(board.height)].map((e) =>
-    Array(board.width).fill(value)
+  var myGrid = [...Array(11)].map((e) =>
+    Array(11).fill(value)
   );
   const snakes = board.snakes;
   snakes.forEach((snake) => {
@@ -208,7 +208,7 @@ module.exports = {
   findAdjacentDirection,
   getAdjacentCoordinate,
   coordinateOutOfBounds,
-  coordinatesAreEqual,
+	coordinatesAreEqual,
 	findClosestApple,
 	distanceToClosestCorner
 };

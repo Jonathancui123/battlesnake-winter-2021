@@ -3,7 +3,7 @@ const {
   getAdjacentCoordinate,
   coordinateOutOfBounds,
   coordinatesAreEqual,
-  boardToGrid,
+	boardToGrid,
 	findClosestApple,
 	distanceToClosestCorner
 } = require("./utils");
@@ -18,7 +18,7 @@ function MinimaxGame(board) {
   // The state of the board at the current node of Minimax simulation
   // Battlesnake API board object
   this.board = board;
-  this.grid = boardToGrid(board);
+  this.grid = boardToGrid(this.board);
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = [];
   // Commit the move to our move history and update this.board
@@ -52,8 +52,9 @@ function MinimaxGame(board) {
 
     // Grid Changes for floodFill
     // TODO: undo function for grid, account for food changes
-    this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y] = 0;
-    this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
+    console.log(this.grid[newSnakeHeadCoordinate.x])
+    // this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y] = 0;
+    // this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
 
 		this.changeHistory.push(newChange);
     // 'currentSnake' object is referencing an object in "this.board"
@@ -218,13 +219,13 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
   const otherSnakeHead = otherSnake.head;
   let headOnCollision = false;
 
-  var mySnakeDead = false;
+	var mySnakeMaybeDead = false; // opponent may not use the best move (head collisions)
   var otherSnakeDead = false;
 
   // my snake head or other snake head out of bounds
-  if (coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
-    mySnakeDead = true;
-  }
+	// being out of bounds is the only death that is certain
+  const mySnakeDead = coordinateOutOfBounds(mySnakeHead, board.height, board.width);
+
   if (coordinateOutOfBounds(otherSnakeHead, board.height, board.width)) {
     otherSnakeDead = true;
   }
@@ -233,12 +234,12 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
   if (coordinatesAreEqual(mySnakeHead, otherSnakeHead)) {
     headOnCollision = true;
     if (mySnake.length === otherSnake.length) {
-      mySnakeDead = true;
+      mySnakeMaybeDead = true;
       otherSnakeDead = true;
     } else if (mySnake.length > otherSnake.length) {
       otherSnakeDead = true;
     } else {
-      mySnakeDead = true;
+      mySnakeMaybeDead = true;
     }
   }
 
@@ -262,7 +263,7 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
 
   if (!headOnCollision) {
     if (mySnakeHeadCollisions > 1) {
-      mySnakeDead = true;
+      mySnakeMaybeDead = true;
     }
     if (mySnakeHeadCollisions > 1) {
       otherSnakeDead = true;
@@ -270,10 +271,10 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
   }
   
 
-  if (mySnakeDead && otherSnakeDead) {
+  if (mySnakeDead) {
     return -1000;
-  } else if (mySnakeDead) {
-    return -1000;
+	} else if (mySnakeMaybeDead) {
+		return -500;
   } else if (otherSnakeDead) {
     return 1000;
   } else {
@@ -283,15 +284,8 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID) => {
 
 // Scores the given game board --> higher score if good for mySnake, lower if bad for mySnake
 const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
-	// range = [0, 100] unless the snake will 100% die
-	var score = 0;
 
-  const gameOverValue = evaluateIfGameOver(board, mySnakeID, otherSnakeID);
-  if (gameOverValue) {
-    return -1000;
-  }
-  
-  // Some operations to simulate the time it would take to actually evaluate the board
+ 	// Some operations to simulate the time it would take to actually evaluate the board
   /*
   var grid = boardToGrid(board);
   const graph = new Graph(grid);
@@ -301,8 +295,19 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
   */
   // console.log("astar: ", result);
 
+	// HEURISTICS!!!!
 
-  // TODO: Heuristic goes here
+	// range = [-1000, 1000]
+	// score will only be negative if it might die
+	var score = 0;
+
+	// gameOverValue is -500 if mySnake might die
+	// gameOverValue is -1000 if mySnake will for sure die
+  const gameOverValue = evaluateIfGameOver(board, mySnakeID, otherSnakeID);
+	if (gameOverValue) {
+  	score += gameOverValue;
+	}
+	
 	const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
 	const mySnakeHead = mySnake.head;

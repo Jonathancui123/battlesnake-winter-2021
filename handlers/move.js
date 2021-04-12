@@ -22,12 +22,7 @@ const { calcBestMove, MinimaxGame } = require("../utils/minimax");
 
 const {MinimaxLogger} = require("../visualizer/minimaxLogger");
 
-
-
-// How many moves to simulate
-// Two moves (one from each snake) is one "turn" in the game. e.g. MINIMAX_DEPTH=2 means that we will only simulate the immediate turn
-const MINIMAX_DEPTH = 4;
-const USE_LOGGER = true;
+const {MINIMAX_DEPTH, USE_LOGGER} = require("../constants")
 
 function handleMove(request, response) {
 
@@ -70,7 +65,6 @@ function handleMove(request, response) {
       minimaxGameObj,
       mySnake.id,
       otherSnake.id,
-      MINIMAX_DEPTH,
       logger  
     )[1];
   } else {

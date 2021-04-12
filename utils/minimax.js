@@ -14,6 +14,8 @@ const {
 
 const { astar, Graph } = require("./pathfinding");
 
+const {MINIMAX_DEPTH, MAX_HEALTH, HEURISTIC_FUTURE_UNCERTAINTY_FACTOR} = require("../constants");
+
 // TODO: Fix "off by one error"
 // Game object which represents the board: (explanation: https://www.w3schools.com/js/js_object_constructors.asp)
 // Supports methods for modifying the board, undoing modifications, and getting potential moves
@@ -111,7 +113,6 @@ const calcBestMove = function (
   game,
   mySnakeID,
   otherSnakeID,
-  MINIMAX_DEPTH,
   logger = undefined,
   alpha = Number.NEGATIVE_INFINITY,
   beta = Number.POSITIVE_INFINITY,
@@ -119,7 +120,7 @@ const calcBestMove = function (
 ) {
   // Base case: evaluate board at maximum depth
   if (remainingDepth === 0) {
-    value = evaluateBoard(game.board, mySnakeID, otherSnakeID, game.grid, MINIMAX_DEPTH, remainingDepth);
+    value = evaluateBoard(game.board, mySnakeID, otherSnakeID, game.grid, remainingDepth);
     if (logger){
       logger.logCurrentNode({move: null, value})
       logger.goToParent();
@@ -133,7 +134,7 @@ const calcBestMove = function (
   if (isMaximizingPlayer) {
 
 
-    const gameOverValue = evaluateIfGameOver(game.board, mySnakeID, otherSnakeID, MINIMAX_DEPTH, remainingDepth);
+    const gameOverValue = evaluateIfGameOver(game.board, mySnakeID, otherSnakeID, remainingDepth);
     if (gameOverValue) {
       if (logger){
         logger.logCurrentNode({move: null, value: gameOverValue, gameOver: true})
@@ -179,7 +180,6 @@ const calcBestMove = function (
       game,
       mySnakeID,
       otherSnakeID,
-      MINIMAX_DEPTH,
       logger,
       alpha,
       beta,
@@ -224,7 +224,7 @@ const calcBestMove = function (
 };
 
 // Returns true if either of the two specified snakes should die from their current position
-const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, MINIMAX_DEPTH, remainingDepth) => {
+const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, remainingDepth) => {
   const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
   const mySnakeHead = mySnake.head;
@@ -288,11 +288,8 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, MINIMAX_DEPTH, remai
     }
   }
   
-
-  
-  const UNCERTAINTY_FACTOR = 0.87
   const adjustForFutureUncertainty = (score) => {
-    // return score* (UNCERTAINTY_FACTOR**(MINIMAX_DEPTH - remainingDepth))
+    // return score* (HEURISTIC_FUTURE_UNCERTAINTY_FACTOR**(MINIMAX_DEPTH - remainingDepth))
     return score;
   }
 
@@ -310,14 +307,14 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, MINIMAX_DEPTH, remai
 };
 
 // Scores the given game board --> higher score if good for mySnake, lower if bad for mySnake
-const evaluateBoard = (board, mySnakeID, otherSnakeID, grid, MINIMAX_DEPTH, remainingDepth) => {
+const evaluateBoard = (board, mySnakeID, otherSnakeID, grid, remainingDepth) => {
 	// range = [-1000, 1000]
 	// score will only be negative if it might die
 	var score = 0;
 
 	// gameOverValue is -500 if mySnake might die
 	// gameOverValue is -1000 if mySnake will for sure die
-  const gameOverValue = evaluateIfGameOver(board, mySnakeID, otherSnakeID, MINIMAX_DEPTH, remainingDepth);
+  const gameOverValue = evaluateIfGameOver(board, mySnakeID, otherSnakeID, remainingDepth);
 	if (gameOverValue) {
   	score += gameOverValue;
 	}
@@ -327,7 +324,6 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID, grid, MINIMAX_DEPTH, rema
 	const mySnakeHead = mySnake.head;
 	const otherSnakeHead = otherSnake.head;
   const MAX_DISTANCE = board.width + board.height;
-  const MAX_HEALTH = 100;
 
 	// if snake is hungry, the closer the snake to food the better
   const mySnakeLength = mySnake.length;

@@ -52,10 +52,13 @@ function MinimaxGame(board) {
 
     // Grid Changes for floodFill
     // TODO: undo function for grid, account for food changes
-    console.log(this.grid[newSnakeHeadCoordinate.x])
-    // this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y] = 0;
-    // this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
-
+    
+    if(newSnakeHeadCoordinate.x >= 0 && newSnakeHeadCoordinate.x <= 10 &&
+    newSnakeHeadCoordinate.y >= 0 && newSnakeHeadCoordinate.y <= 10 ){
+      this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y] = 0;
+      this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
+    }
+ 
 		this.changeHistory.push(newChange);
     // 'currentSnake' object is referencing an object in "this.board"
     // Modify the board object to reflect the changes
@@ -79,8 +82,11 @@ function MinimaxGame(board) {
       );
 
       // Adjustment for grid floodfill
-      this.grid[lastChange.snake.newHeadPosition.x][lastChange.snake.newHeadPosition.y] = 1
-      this.grid[lastChange.snake.prevTailPosition.x][lastChange.snake.prevTailPosition.y] = 0
+      if(lastChange.snake.newHeadPosition.x >= 0 && lastChange.snake.newHeadPosition.x <= 10 &&
+      lastChange.snake.newHeadPosition.y >= 0 && lastChange.snake.newHeadPosition.y <= 10 ){
+        this.grid[lastChange.snake.newHeadPosition.x][lastChange.snake.newHeadPosition.y] = 1
+        this.grid[lastChange.snake.prevTailPosition.x][lastChange.snake.prevTailPosition.y] = 0
+      }
 
       // Opposite order of modifications made in move() method
       currentSnake.body.push(lastChange.snake.prevTailPosition);
@@ -314,6 +320,7 @@ const evaluateBoard = (board, mySnakeID, otherSnakeID) => {
 	const otherSnakeHead = otherSnake.head;
 
 	// if snake is hungry, the closer the snake to food the better
+  const mySnakeLength = mySnake.
 	if (mySnake.health <= 40) {
 		closestAppleDistance = Math.pow(mySnakeHead.x - findClosestApple.x, 2) + Math.pow(mySnakeHead.y - findClosestApple.y, 2);
 		score += closestAppleDistance; // heuristic score can be adjusted later

@@ -48,9 +48,6 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber) {
     this.items.push({
       item: `If ${their_our} snake moved ${minimaxLoggerNode.previousMove.toUpperCase()}:`,
       iskey: true,
-      figure: "",
-      fill: "",
-      stroke: "",
     });
   }
   if (minimaxLoggerNode.data.move) {
@@ -58,27 +55,18 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber) {
     this.items.push({
       item: `${our_their} snake will move ${minimaxLoggerNode.data.move.toUpperCase()}:`,
       iskey: false,
-      figure: "",
-      fill: "",
-      stroke: "",
     });
   } else if (minimaxLoggerNode.data.gameOver) {
     // Game over leaf node
     this.items.push({
       item: `The game is over with`,
       iskey: false,
-      figure: "Circle",
-      fill: colors.red,
-      stroke: colors.red,
     });
   } else {
     // Max depth leaf node
     this.items.push({
       item: `The game is evaluated at`,
       iskey: false,
-      figure: "",
-      fill: "",
-      stroke: "",
     });
   }
   this.items.push({

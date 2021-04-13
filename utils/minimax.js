@@ -357,7 +357,8 @@ const evaluateBoard = (
     remainingDepth
   );
   if (gameOverValue) {
-    score += gameOverValue;
+    score = gameOverValue;
+    return score;
   }
 
   // ********** HEURISTIC: FOOD (Health, size) *************
@@ -438,7 +439,6 @@ const evaluateBoard = (
 
   if (logger) {
     const heuristicInfo = {
-      "Game Over": gameOverValue,
       Food: foodScore,
       Floodfill: floodFillScore,
       Edges: edgesScore,

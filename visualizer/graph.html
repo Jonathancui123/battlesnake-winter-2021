@@ -15,7 +15,7 @@
 
     <script>
       // Change this number and refresh your page to see a diffferent turn
-      const TURN_NUMBER = 112;
+      const TURN_NUMBER = 1;
 
       var $ = go.GraphObject.make;
       var myDiagram = $(go.Diagram, "myDiagramDiv", {
@@ -57,30 +57,27 @@
       myDiagram.nodeTemplate = $(
         go.Node,
         "Auto",
-        {
-          background: "#FFFFFF",
-        },
         $(
-          go.TextBlock,
-          "Default Text",
-          { margin: 12, stroke: "blue", font: "bold 16px sans-serif" },
-          new go.Binding("text", "name")
+          go.Shape,
+          "Rectangle",
+          {
+            fill: "white",
+            stroke: null,
+            strokeWidth: 0,
+            stretch: go.GraphObject.Fill,
+            alignment: go.Spot.Center,
+          },
+          new go.Binding("fill", "colour")
         ),
         $(
           go.Panel,
-          "Table",
-          { margin: 8, stretch: go.GraphObject.Fill },
-          $(go.RowColumnDefinition, {
-            row: 0,
-            sizing: go.RowColumnDefinition.None,
-          }),
-          // the collapse/expand button
+          "Vertical",
           $(
-            "PanelExpanderButton",
-            "LIST", // the name of the element whose visibility this button toggles
-            { row: 0, alignment: go.Spot.TopRight }
+            go.TextBlock,
+            "Default Text",
+            { margin: 12, stroke: "blue", font: "bold 16px sans-serif" },
+            new go.Binding("text", "name")
           ),
-          // the list of Panels, each showing an attribute
           $(
             go.Panel,
             "Vertical",
@@ -91,26 +88,11 @@
               alignment: go.Spot.TopLeft,
               defaultAlignment: go.Spot.Left,
               stretch: go.GraphObject.Horizontal,
+              margin: 8,
               itemTemplate: itemTempl,
             },
             new go.Binding("itemArray", "items")
-          )
-        ),
-        $(
-          go.Panel,
-          "Table",
-          { margin: 8, stretch: go.GraphObject.Fill },
-          $(go.RowColumnDefinition, {
-            row: 0,
-            sizing: go.RowColumnDefinition.None,
-          }),
-          // the collapse/expand button
-          $(
-            "PanelExpanderButton",
-            "LISTSMALL", // the name of the element whose visibility this button toggles
-            { row: 0, alignment: go.Spot.TopRight }
           ),
-          // the list of Panels, each showing an attribute
           $(
             go.Panel,
             "Vertical",
@@ -121,6 +103,7 @@
               alignment: go.Spot.TopLeft,
               defaultAlignment: go.Spot.Left,
               stretch: go.GraphObject.Horizontal,
+              margin: 8,
               itemTemplate: itemTemplSmall,
             },
             new go.Binding("itemArray", "itemsSmall")

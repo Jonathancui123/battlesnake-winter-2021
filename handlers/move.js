@@ -13,7 +13,7 @@ const {
 } = require("../utils/utils");
 
 const { 
-  floodfill
+  largestAdjacentFloodfill
 } = require("../utils/floodfill")
 
 const { astar, Graph } = require("../utils/pathfinding");
@@ -100,7 +100,7 @@ function handleMove(request, response) {
     var i;
     for (i = 0; i < safeMovesFromHeadOnDeath.length; i++) {
       spotToFloodFill = getAdjacentCoordinate(mySnake.head, safeMovesFromHeadOnDeath[i])
-      numSpaces = floodfill(grid, spotToFloodFill.x, spotToFloodFill.y, maxFloodfillCount);
+      numSpaces = largestAdjacentFloodfill(grid, spotToFloodFill.x, spotToFloodFill.y, maxFloodfillCount);
       if (numSpaces > mySnake.length * 1.5) {
         safeMovesFromHeadOnAndFloodfill.push(safeMovesFromHeadOnDeath[i]);
       }

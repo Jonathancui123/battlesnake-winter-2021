@@ -8,7 +8,7 @@ const {
 } = require("fs");
 const path = require("path");
 
-const { LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE } = require("../constants");
+const { LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE, COLOURS } = require("../constants");
 
 // Stores the data necessary for the visualizer to represent this node in a graph
 function VisualizerNode(minimaxLoggerNode, loggerTurnNumber) {
@@ -28,19 +28,15 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber) {
   }
   this.key = minimaxLoggerNode.nodeId;
   this.name = `Turn ${newTurnNumber}, ${whose_move}`;
-
   // Colours var for the block
-  var colors = {
-    red: "#be4b15",
-    green: "#52ce60",
-    blue: "#6ea5f8",
-    lightred: "#fd8852",
-    lightblue: "#afd4fe",
-    lightgreen: "#b9e986",
-    pink: "#faadc1",
-    purple: "#d689ff",
-    orange: "#fdb400",
-  };
+  //Background colors
+  if (minimaxLoggerNode.data.gameOver && minimaxLoggerNode.data.value < 0){ // We die
+    this.colour = COLOURS.red
+  } else if (minimaxLoggerNode.data.gameOver && minimaxLoggerNode.data.value > 0) {
+    // enemy dies
+    this.colour = COLOURS.green
+  }
+
 
   // list items design
   this.items = [];
@@ -116,6 +112,13 @@ function MinimaxLoggerNode(
   };
 }
 
+// Value tree maps the ID of each node to its value
+function ValueTreeNode(id) {
+  this.id = id;
+  this.children = [];
+  this.value = undefined;
+}
+
 // Globally available object that implements navigation methods to track of the current position in the minimax simulation tree and log everything in the right place
 function MinimaxLogger(gameId, turnNumber) {
   // store game Id and turn number to write to correct log
@@ -131,10 +134,15 @@ function MinimaxLogger(gameId, turnNumber) {
   // VisualizerNodes of the minimax simulation states that we have finished processing
   // A list to collect our log data before writing it to json
   this.finishedNodes = [];
+  this.finishedNodesTemp = {}
+
+  // Holdes an object with all of the nodes mapping ID to object
+  this.valueTree = {};
 
   this.init = function () {
     this.currentNode = new MinimaxLoggerNode(0);
     this.nodeStack.push(this.currentNode);
+    this.valueTree[this.currentNode.nodeid] = new ValueTreeNode(this.currentNode.nodeId);
   };
 
   // Step one level deeper in the simulation than before
@@ -154,6 +162,10 @@ function MinimaxLogger(gameId, turnNumber) {
     // push new node to nodeStack
     this.nodeStack.push(this.currentNode);
 
+    // maintain value tree
+    this.valueTree[newNodeParentId].children.push(this.currentNode.nodeId);
+    this.valueTree[this.currentNode.nodeId] = new ValueTreeNode(this.currentNode.nodeId)    
+
     return;
   };
 
@@ -162,6 +174,8 @@ function MinimaxLogger(gameId, turnNumber) {
     // pop the node off of the nodeStack (we are finished processing it)
     const newFinishedNode = this.nodeStack.pop();
 
+    this.valueTree[newFinishedNode.nodeId].value = newFinishedNode.data.value;
+
     if (this.nodeStack.length > 0) {
       // handle empty nodeStack for the last node we process (root node)
       this.currentNode = this.nodeStack[this.nodeStack.length - 1];
@@ -169,7 +183,9 @@ function MinimaxLogger(gameId, turnNumber) {
 
     // We will never return to this node, commit it's contents to the finishedNodes
     const newVisualizerNode = new VisualizerNode(newFinishedNode, turnNumber);
-    this.finishedNodes.push(newVisualizerNode);
+    
+    // this.finishedNodes.push(newVisualizerNode);
+    this.finishedNodesTemp[newVisualizerNode.key] = newVisualizerNode;
 
     return;
   };
@@ -194,8 +210,42 @@ function MinimaxLogger(gameId, turnNumber) {
     return;
   };
 
+  this.modifyColoursToShowSelectedPath = function(nodeId, evenDepth=true){
+    let comparator = (a, b) => {
+      return a < b;
+    }
+    if (!evenDepth) {
+      comparator = (a, b) => {
+        return a > b;
+      } 
+    }
+    const currentFinishedNode = this.finishedNodesTemp[nodeId]
+    const currentValueTreeNode = this.valueTree[nodeId]
+    currentFinishedNode.colour = COLOURS.selected;
+
+    let bestValue = evenDepth ? Number.NEGATIVE_INFINITY :  Number.POSITIVE_INFINITY;
+    let selectedNodeId = undefined
+
+    for (const childId of currentValueTreeNode.children){
+      if (comparator(this.valueTree[childId].value, bestValue )){
+        bestValue = this.valueTree[childId].value
+        selectedNodeId = childId
+      }
+    }
+
+    if (selectedNodeId) {
+      this.modifyColoursToShowSelectedPath(selectedNodeId, !evenDepth);
+    }
+  }
+
   // Writes the logged data to a json file after a response has been given to Battlesnake game server
   this.writeLogsToJson = function () {
+
+    // Modify colours of the selected nodes
+    this.modifyColoursToShowSelectedPath('0');
+    
+    this.finishedNodes = [...Object.values(this.finishedNodesTemp)]
+
     const folderpath = path.join(__dirname, `logs`);
     if (!existsSync(folderpath)) {
       mkdirSync(folderpath);

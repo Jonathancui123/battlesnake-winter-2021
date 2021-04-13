@@ -8,7 +8,7 @@ const {
   distanceToClosestCorner,
 } = require("./utils");
 
-const { floodfill } = require("./floodfill");
+const { largestAdjacentFloodfill } = require("./floodfill");
 
 const { astar, Graph } = require("./pathfinding");
 
@@ -257,13 +257,9 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, remainingDepth) => {
   let otherSnakeDead = false;
   let otherSnakeMaybeDead = false;
 
-  // my snake head or other snake head out of bounds
-  // being out of bounds is the only death that is certain
-
   if (coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
     mySnakeDead = true;
   }
-
   if (coordinateOutOfBounds(otherSnakeHead, board.height, board.width)) {
     otherSnakeDead = true;
   }
@@ -301,11 +297,9 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, remainingDepth) => {
 
   if (!headOnCollision) {
     if (mySnakeHeadCollisions > 1) {
-      mySnakeMaybeDead = true;
+      mySnakeDead = true;
     }
-    if (mySnakeHeadCollisions > 1) {
-      // remember to do this
-      console.log(mySnakeHeadCollisions);
+    if (otherSnakeHeadCollisions > 1) {
       otherSnakeDead = true;
     }
   }
@@ -377,19 +371,19 @@ const evaluateBoard = (
     foodScore =
       ((MAX_DISTANCE - closestAppleDistance) / 4) ** 2 +
       ((MAX_HEALTH - mySnake.health) / 5) ** 2;
+    
+    foodScore *= (MAX_HEALTH - mySnake.health);
     console.log(foodScore);
   }
-  score += foodScore; // heuristic score can be adjusted later
+  score += foodScore;
+
   // ********** HEURISTIC: FLOODFILL *************
   let cavernSize;
   let floodFillScore;
-  // floodfill heuristic
   if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
-    grid[mySnakeHead.x][mySnakeHead.y] = 1;
-    cavernSize = floodfill(
+    cavernSizeUp = largestAdjacentFloodfill(
       grid,
-      mySnakeHead.x,
-      mySnakeHead.y,
+      mySnakeHead,
       mySnakeLength * 2
     );
     console.log(
@@ -400,42 +394,72 @@ const evaluateBoard = (
         ":" +
         cavernSize
     );
-    grid[mySnakeHead.x][mySnakeHead.y] = 0;
   }
 
-  if (cavernSize <= mySnakeLength) {
-    floodFillScore = -1000;
-  } else {
-    floodFillScore = 0;
-  }
+  floodFillScore = cavernSize <= mySnakeLength ? -1000 : 0;
+
+  // if (cavernSize <= mySnakeLength) {
+  //   floodFillScore = -1000;
+  // } else {
+  //   floodFillScore = 0;
+  // }
   score += floodFillScore;
 
   // ********** HEURISTIC: EDGES *************
-  // the further from the edge the better
-  // add the minimum distance between the x and y distance
   let edgesScore;
+
+  // the further our snake is from the edge the better
   var x = 0;
   var y = 0;
+  var enemyX = 0;
+  var enemyY = 0;
 
-  if (mySnakeHead.x < board.width / 2) {
-    x = mySnakeHead.x;
-  } else {
-    x = board.width - mySnakeHead.x;
-  }
+  x = mySnakeHead.x < board.width / 2 ? mySnakeHead.x : board.width - mySnakeHead.x;
+  y = mySnakeHead.y < board.width / 2 ? mySnakeHead.y : board.width - mySnakeHead.y;
 
-  if (mySnakeHead.y < board.width / 2) {
-    y = mySnakeHead.y;
-  } else {
-    y = board.width - mySnakeHead.y;
-  }
+  enemyX = 
+    otherSnakeHead.x < board.width / 2 ? board.width - otherSnakeHead.x : otherSnakeHead.x;
+  enemyY = 
+    otherSnakeHead.y < board.width / 2 ? board.width - otherSnakeHead.y : otherSnakeHead.y;
 
-  edgesScore = Math.min(x, y) * 10 + 10;
+  edgesScore = (Math.min(x, y) + Math.max(enemyX, enemyY)) * 10 + 10;
+
   score += edgesScore;
+
+  // if (mySnakeHead.x < board.width / 2) {
+  //   x = mySnakeHead.x;
+  // } else {
+  //   x = board.width - mySnakeHead.x;
+  // }
+  // if (mySnakeHead.y < board.width / 2) {
+  //   y = mySnakeHead.y;
+  // } else {
+  //   y = board.width - mySnakeHead.y;
+  // }
+  // edgesScore = Math.min(x, y) * 10 + 10;
+
+  // the closer the enemy is to the edge, the better
+  // var enemyX = 0;
+  // var enemyY = 0;
+  // if (otherSnakeHead.x < board.width / 2) {
+  //   enemyX = board.width - otherSnakeHead.x;
+  // } else {
+  //   enemyX = otherSnakeHead.x;
+  // }
+  // if (otherSnakeHead.y < board.width / 2) {
+  //   enemyY = board.width - otherSnakeHead.y;
+  // } else {
+  //   enemyY = otherSnakeHead.y;
+  // }
+
+  // edgesScore += Math.max(enemyX, enemyY) * 10 + 10;
+
   // ********** HEURISTIC: CORNERS *************
   let cornerScore;
-  // check distance of enemy head from corner
   cornerScore = MAX_DISTANCE - distanceToClosestCorner(otherSnakeHead, board);
+  cornerScore -= (MAX_DISTANCE - distanceToClosestCorner(mySnakeHead, board)) / 2;
   score += cornerScore;
+
 
   if (logger) {
     const heuristicInfo = {

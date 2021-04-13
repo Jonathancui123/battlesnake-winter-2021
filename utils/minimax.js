@@ -134,7 +134,8 @@ const calcBestMove = function (
       mySnakeID,
       otherSnakeID,
       game.grid,
-      remainingDepth
+      remainingDepth,
+      logger
     );
     if (logger) {
       logger.logCurrentMoveAndValue({ move: null, value });
@@ -333,12 +334,20 @@ const evaluateBoard = (
   mySnakeID,
   otherSnakeID,
   grid,
-  remainingDepth
+  remainingDepth,
+  logger
 ) => {
   // range = [-1000, 1000]
   // score will only be negative if it might die
   var score = 0;
 
+  const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
+  const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
+  const mySnakeHead = mySnake.head;
+  const otherSnakeHead = otherSnake.head;
+  const MAX_DISTANCE = board.width + board.height;
+
+  // ********** HEURISTIC: KILL/DEATH *************
   // gameOverValue is -500 if mySnake might die
   // gameOverValue is -1000 if mySnake will for sure die
   const gameOverValue = evaluateIfGameOver(
@@ -351,12 +360,8 @@ const evaluateBoard = (
     score += gameOverValue;
   }
 
-  const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
-  const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
-  const mySnakeHead = mySnake.head;
-  const otherSnakeHead = otherSnake.head;
-  const MAX_DISTANCE = board.width + board.height;
-
+  // ********** HEURISTIC: FOOD (Health, size) *************
+  let foodScore;
   // if snake is hungry, the closer the snake to food the better
   const mySnakeLength = mySnake.length;
   const closestApple = findClosestApple(board.food, mySnakeHead);
@@ -368,15 +373,15 @@ const evaluateBoard = (
       Math.abs(mySnakeHead.x - closestApple.x) +
       Math.abs(mySnakeHead.y - closestApple.y);
 
-    const foodScore =
+    foodScore =
       ((MAX_DISTANCE - closestAppleDistance) / 4) ** 2 +
       ((MAX_HEALTH - mySnake.health) / 5) ** 2;
     console.log(foodScore);
-    score += foodScore; // heuristic score can be adjusted later
   }
-
+  score += foodScore; // heuristic score can be adjusted later
+  // ********** HEURISTIC: FLOODFILL *************
   let cavernSize;
-
+  let floodFillScore;
   // floodfill heuristic
   if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
     grid[mySnakeHead.x][mySnakeHead.y] = 1;
@@ -398,13 +403,16 @@ const evaluateBoard = (
   }
 
   if (cavernSize <= mySnakeLength) {
-    score = -1000;
-    return score;
+    floodFillScore = -1000;
+  } else {
+    floodFillScore = 0;
   }
+  score += floodFillScore;
 
+  // ********** HEURISTIC: EDGES *************
   // the further from the edge the better
   // add the minimum distance between the x and y distance
-  const distanceFromEdge = 0;
+  let edgesScore;
   var x = 0;
   var y = 0;
 
@@ -420,10 +428,24 @@ const evaluateBoard = (
     y = board.width - mySnakeHead.y;
   }
 
-  score += Math.min(x, y) * 10 + 10;
-
+  edgesScore = Math.min(x, y) * 10 + 10;
+  score += edgesScore;
+  // ********** HEURISTIC: CORNERS *************
+  let cornerScore;
   // check distance of enemy head from corner
-  score += MAX_DISTANCE - distanceToClosestCorner(otherSnakeHead, board);
+  cornerScore = MAX_DISTANCE - distanceToClosestCorner(otherSnakeHead, board);
+  score += cornerScore;
+
+  if (logger) {
+    const heuristicInfo = {
+      "Game Over": gameOverValue,
+      Food: foodScore,
+      Floodfill: floodFillScore,
+      Edges: edgesScore,
+      Corners: cornerScore,
+    };
+    logger.logHeuristicDetails(heuristicInfo);
+  }
 
   return score;
   // When the enemy snake is close to the edge, attempt to get closer to

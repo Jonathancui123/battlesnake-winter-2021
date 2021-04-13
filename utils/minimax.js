@@ -98,11 +98,11 @@ function MinimaxGame(board) {
 
       // Adjustment for grid floodfill
       if (!coordinateOutOfBounds(lastChange.snake.newHeadPosition, this.board.height, this.board.width)) {
-        this.grid[lastChange.snake.newHeadPosition.y][
-          lastChange.snake.newHeadPosition.x
+        this.grid[lastChange.snake.newHeadPosition.x][
+          lastChange.snake.newHeadPosition.y
         ] = 1;
-        this.grid[lastChange.snake.prevTailPosition.y][
-          lastChange.snake.prevTailPosition.x
+        this.grid[lastChange.snake.prevTailPosition.x][
+          lastChange.snake.prevTailPosition.y
         ] = 0;
       }
 
@@ -374,6 +374,13 @@ const evaluateBoard = (
       Math.abs(mySnakeHead.x - closestApple.x) +
       Math.abs(mySnakeHead.y - closestApple.y);
 
+    // if (logger) {
+    //   const heuristicInfo = {  
+    //     closestAppleDist: closestAppleDistance
+    //   };
+    //   logger.logHeuristicDetails(heuristicInfo);
+    // }
+
     foodScore =
       ((MAX_DISTANCE - closestAppleDistance) / 4) ** 2 +
       ((MAX_HEALTH - mySnake.health) / 5) ** 2;
@@ -435,7 +442,7 @@ const evaluateBoard = (
 
 
   if (logger) {
-    const heuristicInfo = {      
+    const heuristicInfo = {  
       Food: foodScore,
       Floodfill: floodFillScore,
       Cavern: cavernSize,

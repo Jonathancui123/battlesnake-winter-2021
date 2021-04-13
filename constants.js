@@ -2,7 +2,7 @@
 
 module.exports = {
   // Logger
-  USE_LOGGER : true,
+  USE_LOGGER : false,
   LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE: 30,
   COLOURS : {
     red: "#be4b15",

@@ -61,11 +61,14 @@ const largestAdjacentFloodfill = (grid, snakeHead, maxFloodfillCount) => {
       console.log("skipped: " + JSON.stringify(tilesToCheck[i].x) + "," + JSON.stringify(tilesToCheck[i].y))
     }
   }
-  // console.log(adjacentScores)
-  var max = adjacentScores.reduce(function(a, b) {
-    return Math.max(a, b);
-  });
-  return max;
+  console.log(adjacentScores)
+  curMax = adjacentScores[0];
+  for (var i = 1; i < adjacentScores.length; i++) {
+    if (adjacentScores[i] > curMax) {
+      curMax = adjacentScores[i]
+    }
+  }
+  return curMax
 }
 
 const isSafe = (board, x, y) => {

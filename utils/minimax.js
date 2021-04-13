@@ -373,7 +373,7 @@ const evaluateBoard = (
       ((MAX_HEALTH - mySnake.health) / 5) ** 2;
     
     foodScore *= (MAX_HEALTH - mySnake.health);
-    console.log(foodScore);
+    // console.log(foodScore);
   }
   score += foodScore;
 
@@ -386,14 +386,14 @@ const evaluateBoard = (
       mySnakeHead,
       mySnakeLength * 2
     );
-    console.log(
-      "cavernSize for " +
-        mySnakeHead.x +
-        ", " +
-        mySnakeHead.y +
-        ":" +
-        cavernSize
-    );
+    // console.log(
+    //   "cavernSize for " +
+    //     mySnakeHead.x +
+    //     ", " +
+    //     mySnakeHead.y +
+    //     ":" +
+    //     cavernSize
+    // );
   }
 
   floodFillScore = cavernSize <= mySnakeLength ? -1000 : 0;

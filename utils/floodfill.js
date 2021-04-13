@@ -58,7 +58,7 @@ const largestAdjacentFloodfill = (grid, snakeHead, maxFloodfillCount) => {
     if(!visited[JSON.stringify(tilesToCheck[i].x) + "," + JSON.stringify(tilesToCheck[i].y)]){
       adjacentScores.push(floodfillHelper(grid, tilesToCheck[i].x, tilesToCheck[i].y, maxFloodfillCount, visited))
     } else {
-      console.log("skipped: " + JSON.stringify(tilesToCheck[i].x) + "," + JSON.stringify(tilesToCheck[i].y))
+      // console.log("skipped: " + JSON.stringify(tilesToCheck[i].x) + "," + JSON.stringify(tilesToCheck[i].y))
     }
   }
   // console.log(adjacentScores)

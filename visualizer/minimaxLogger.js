@@ -31,10 +31,12 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber) {
   // Colours var for the block
   //Background colors
   if (minimaxLoggerNode.data.gameOver && minimaxLoggerNode.data.value < 0){ // We die
-    this.colour = COLOURS.red
+    console.log(this.colour)
+    this.colour = COLOURS.lightRed
   } else if (minimaxLoggerNode.data.gameOver && minimaxLoggerNode.data.value > 0) {
     // enemy dies
-    this.colour = COLOURS.green
+    console.log(this.colour)
+    this.colour = COLOURS.lightGreen
   }
 
 
@@ -142,7 +144,7 @@ function MinimaxLogger(gameId, turnNumber) {
   this.init = function () {
     this.currentNode = new MinimaxLoggerNode(0);
     this.nodeStack.push(this.currentNode);
-    this.valueTree[this.currentNode.nodeid] = new ValueTreeNode(this.currentNode.nodeId);
+    this.valueTree[this.currentNode.nodeId] = new ValueTreeNode(this.currentNode.nodeId);
   };
 
   // Step one level deeper in the simulation than before
@@ -211,23 +213,32 @@ function MinimaxLogger(gameId, turnNumber) {
   };
 
   this.modifyColoursToShowSelectedPath = function(nodeId, evenDepth=true){
+
+    
+
     let comparator = (a, b) => {
-      return a < b;
+      return a > b;
     }
     if (!evenDepth) {
       comparator = (a, b) => {
-        return a > b;
+        return a < b;
       } 
     }
+
+    const currentValueTreeNode = this.valueTree[nodeId];
+    console.log(`NODE ID ${nodeId}`)
+    console.log(`NODE ${currentValueTreeNode.children}`)
+
     const currentFinishedNode = this.finishedNodesTemp[nodeId]
-    const currentValueTreeNode = this.valueTree[nodeId]
     currentFinishedNode.colour = COLOURS.selected;
 
     let bestValue = evenDepth ? Number.NEGATIVE_INFINITY :  Number.POSITIVE_INFINITY;
     let selectedNodeId = undefined
 
     for (const childId of currentValueTreeNode.children){
+      // console.log("beep")
       if (comparator(this.valueTree[childId].value, bestValue )){
+        // console.log("boop")
         bestValue = this.valueTree[childId].value
         selectedNodeId = childId
       }

@@ -356,8 +356,7 @@ const evaluateBoard = (
   }
 
   // ********** HEURISTIC: FOOD (Health, size) *************
-  let foodScore;
-  // if snake is hungry, the closer the snake to food the better
+  // let foodScore;
   const mySnakeLength = mySnake.length;
   const closestApple = findClosestApple(board.food, mySnakeHead);
   if (
@@ -372,8 +371,8 @@ const evaluateBoard = (
       ((MAX_DISTANCE - closestAppleDistance) / 4) ** 2 +
       ((MAX_HEALTH - mySnake.health) / 5) ** 2;
     
-    foodScore *= (MAX_HEALTH - mySnake.health);
-    // console.log(foodScore);
+   foodScore *= (MAX_HEALTH - mySnake.health) / 5;
+    console.log(foodScore);
   }
   score += foodScore;
 
@@ -381,7 +380,7 @@ const evaluateBoard = (
   let cavernSize;
   let floodFillScore;
   if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
-    cavernSizeUp = largestAdjacentFloodfill(
+    cavernSize = largestAdjacentFloodfill(
       grid,
       mySnakeHead,
       mySnakeLength * 2
@@ -397,18 +396,11 @@ const evaluateBoard = (
   }
 
   floodFillScore = cavernSize <= mySnakeLength ? -1000 : 0;
-
-  // if (cavernSize <= mySnakeLength) {
-  //   floodFillScore = -1000;
-  // } else {
-  //   floodFillScore = 0;
-  // }
   score += floodFillScore;
 
   // ********** HEURISTIC: EDGES *************
   let edgesScore;
 
-  // the further our snake is from the edge the better
   var x = 0;
   var y = 0;
   var enemyX = 0;
@@ -425,34 +417,6 @@ const evaluateBoard = (
   edgesScore = (Math.min(x, y) + Math.max(enemyX, enemyY)) * 10 + 10;
 
   score += edgesScore;
-
-  // if (mySnakeHead.x < board.width / 2) {
-  //   x = mySnakeHead.x;
-  // } else {
-  //   x = board.width - mySnakeHead.x;
-  // }
-  // if (mySnakeHead.y < board.width / 2) {
-  //   y = mySnakeHead.y;
-  // } else {
-  //   y = board.width - mySnakeHead.y;
-  // }
-  // edgesScore = Math.min(x, y) * 10 + 10;
-
-  // the closer the enemy is to the edge, the better
-  // var enemyX = 0;
-  // var enemyY = 0;
-  // if (otherSnakeHead.x < board.width / 2) {
-  //   enemyX = board.width - otherSnakeHead.x;
-  // } else {
-  //   enemyX = otherSnakeHead.x;
-  // }
-  // if (otherSnakeHead.y < board.width / 2) {
-  //   enemyY = board.width - otherSnakeHead.y;
-  // } else {
-  //   enemyY = otherSnakeHead.y;
-  // }
-
-  // edgesScore += Math.max(enemyX, enemyY) * 10 + 10;
 
   // ********** HEURISTIC: CORNERS *************
   let cornerScore;

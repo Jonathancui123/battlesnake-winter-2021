@@ -30,19 +30,6 @@
       var itemTempl = $(
         go.Panel,
         "Horizontal",
-        // $(
-        //   go.Shape,
-        //   {
-        //     desiredSize: new go.Size(15, 15),
-        //     strokeJoin: "round",
-        //     strokeWidth: 3,
-        //     stroke: null,
-        //     margin: 2,
-        //   },
-        //   new go.Binding("figure", "figure"),
-        //   new go.Binding("fill", "color"),
-        //   new go.Binding("stroke", "color")
-        // ),
         $(
           go.TextBlock,
           {
@@ -53,42 +40,91 @@
         )
       );
 
+      var itemTemplSmall = $(
+        go.Panel,
+        "Horizontal",
+        $(
+          go.TextBlock,
+          {
+            stroke: "#333333",
+            font: "lighter 10px sans-serif",
+          },
+          new go.Binding("text", "item")
+        )
+      );
+
       // the template we defined earlier
       myDiagram.nodeTemplate = $(
         go.Node,
         "Auto",
         {
-          background: "#FFFFFF" },
-        // $(go.Picture,
-        //   { margin: 10, width: 50, height: 50, background: "red" },
-        //   new go.Binding("source")),
+          background: "#FFFFFF",
+        },
         $(
           go.TextBlock,
           "Default Text",
           { margin: 12, stroke: "blue", font: "bold 16px sans-serif" },
           new go.Binding("text", "name")
         ),
-        $(go.Panel, "Table",
-          { margin: 8, stretch: go.GraphObject.Fill },
-          $(go.RowColumnDefinition, { row: 0, sizing: go.RowColumnDefinition.None }),
-          // the collapse/expand button
-          $("PanelExpanderButton", "LIST",  // the name of the element whose visibility this button toggles
-            { row: 0, alignment: go.Spot.TopRight }),
-          // the list of Panels, each showing an attribute
         $(
           go.Panel,
-          "Vertical",
-          {
-            name: "LIST",
-            row: 1,
-            padding: 3,
-            alignment: go.Spot.TopLeft,
-            defaultAlignment: go.Spot.Left,
-            stretch: go.GraphObject.Horizontal,
-            itemTemplate: itemTempl,
-          },
-          new go.Binding("itemArray", "items")
-        )
+          "Table",
+          { margin: 8, stretch: go.GraphObject.Fill },
+          $(go.RowColumnDefinition, {
+            row: 0,
+            sizing: go.RowColumnDefinition.None,
+          }),
+          // the collapse/expand button
+          $(
+            "PanelExpanderButton",
+            "LIST", // the name of the element whose visibility this button toggles
+            { row: 0, alignment: go.Spot.TopRight }
+          ),
+          // the list of Panels, each showing an attribute
+          $(
+            go.Panel,
+            "Vertical",
+            {
+              name: "LIST",
+              row: 1,
+              padding: 3,
+              alignment: go.Spot.TopLeft,
+              defaultAlignment: go.Spot.Left,
+              stretch: go.GraphObject.Horizontal,
+              itemTemplate: itemTempl,
+            },
+            new go.Binding("itemArray", "items")
+          )
+        ),
+        $(
+          go.Panel,
+          "Table",
+          { margin: 8, stretch: go.GraphObject.Fill },
+          $(go.RowColumnDefinition, {
+            row: 0,
+            sizing: go.RowColumnDefinition.None,
+          }),
+          // the collapse/expand button
+          $(
+            "PanelExpanderButton",
+            "LISTSMALL", // the name of the element whose visibility this button toggles
+            { row: 0, alignment: go.Spot.TopRight }
+          ),
+          // the list of Panels, each showing an attribute
+          $(
+            go.Panel,
+            "Vertical",
+            {
+              name: "LISTSMALL",
+              row: 1,
+              padding: 2,
+              alignment: go.Spot.TopLeft,
+              defaultAlignment: go.Spot.Left,
+              stretch: go.GraphObject.Horizontal,
+              itemTemplate: itemTemplSmall,
+            },
+            new go.Binding("itemArray", "itemsSmall")
+          )
         )
       );
 
@@ -100,12 +136,9 @@
       console.log(resourceUrl);
       fetch(resourceUrl)
         .then((response) => {
-          console.log(response);
           return response.json();
         })
         .then((responseBody) => {
-          console.log(responseBody);
-          // TODO: implement handling for visualizing different turns
           const turnNumberString = `turn_${TURN_NUMBER}`;
           model.nodeDataArray = responseBody[turnNumberString];
           myDiagram.model = model;

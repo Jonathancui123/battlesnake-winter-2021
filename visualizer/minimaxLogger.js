@@ -84,10 +84,19 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber) {
   this.items.push({
     item: `Value: ${minimaxLoggerNode.data.value}:`,
     iskey: false,
-    figure: "",
-    fill: "",
-    stroke: "",
   });
+
+  // small details design
+  this.itemsSmall = [];
+
+  for (const [heuristic, value] of Object.entries(
+    minimaxLoggerNode.data.details
+  )) {
+    this.itemsSmall.push({
+      item: `${heuristic}: ${value}`,
+      iskey: false,
+    });
+  }
 }
 
 // Stores the data for a node (a game board state) in the minimax tree
@@ -114,7 +123,9 @@ function MinimaxLoggerNode(
 
   this.childCount = 0;
 
-  this.data = {};
+  this.data = {
+    details: {},
+  };
 }
 
 // Globally available object that implements navigation methods to track of the current position in the minimax simulation tree and log everything in the right place
@@ -185,6 +196,13 @@ function MinimaxLogger(gameId, turnNumber) {
   this.logCurrentMoveAndValue = function (info) {
     // should take in an object with optional properties
     Object.assign(this.currentNode.data, info);
+    return;
+  };
+
+  // Records heuristic details for a leaf node
+  // info should be in the format of {"heuristicName": "value"}
+  this.logHeuristicDetails = function (info) {
+    Object.assign(this.currentNode.data.details, info);
     return;
   };
 

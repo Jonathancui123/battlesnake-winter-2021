@@ -31,11 +31,9 @@ function VisualizerNode(minimaxLoggerNode, loggerTurnNumber) {
   // Colours var for the block
   //Background colors
   if (minimaxLoggerNode.data.gameOver && minimaxLoggerNode.data.value < 0){ // We die
-    console.log(this.colour)
     this.colour = COLOURS.lightRed
   } else if (minimaxLoggerNode.data.gameOver && minimaxLoggerNode.data.value > 0) {
     // enemy dies
-    console.log(this.colour)
     this.colour = COLOURS.lightGreen
   }
 
@@ -226,8 +224,6 @@ function MinimaxLogger(gameId, turnNumber) {
     }
 
     const currentValueTreeNode = this.valueTree[nodeId];
-    console.log(`NODE ID ${nodeId}`)
-    console.log(`NODE ${currentValueTreeNode.children}`)
 
     const currentFinishedNode = this.finishedNodesTemp[nodeId]
     currentFinishedNode.colour = COLOURS.selected;
@@ -236,9 +232,7 @@ function MinimaxLogger(gameId, turnNumber) {
     let selectedNodeId = undefined
 
     for (const childId of currentValueTreeNode.children){
-      // console.log("beep")
       if (comparator(this.valueTree[childId].value, bestValue )){
-        // console.log("boop")
         bestValue = this.valueTree[childId].value
         selectedNodeId = childId
       }

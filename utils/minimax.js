@@ -6,6 +6,7 @@ const {
   boardToGrid,
   findClosestApple,
   distanceToClosestCorner,
+  prettyPrintGrid
 } = require("./utils");
 
 const { largestAdjacentFloodfill } = require("./floodfill");
@@ -25,9 +26,15 @@ function MinimaxGame(board) {
   // The state of the board at the current node of Minimax simulation
   // Battlesnake API board object
   this.board = board;
+
+  // this.grid is a 2D array where the outer array indices are vertical from one another, and inner array indices are horizontal from one another
+  // i.e. this.grid[y][x]
   this.grid = boardToGrid(this.board);
+  prettyPrintGrid(this.grid)
+
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = [];
+
   // Commit the move to our move history and update this.board
   // move: the direction (string) in which the snake will move
   // snakeID: the snake which is being moved
@@ -58,11 +65,10 @@ function MinimaxGame(board) {
     // Grid Changes for floodFill
     // TODO: undo function for grid, account for food changes
 
+
+
     if (
-      newSnakeHeadCoordinate.x >= 0 &&
-      newSnakeHeadCoordinate.x <= 10 &&
-      newSnakeHeadCoordinate.y >= 0 &&
-      newSnakeHeadCoordinate.y <= 10
+     !coordinateOutOfBounds(newSnakeHeadCoordinate, this.board.height, this.board.width)
     ) {
       this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y] = 0;
       this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
@@ -91,17 +97,12 @@ function MinimaxGame(board) {
       );
 
       // Adjustment for grid floodfill
-      if (
-        lastChange.snake.newHeadPosition.x >= 0 &&
-        lastChange.snake.newHeadPosition.x <= 10 &&
-        lastChange.snake.newHeadPosition.y >= 0 &&
-        lastChange.snake.newHeadPosition.y <= 10
-      ) {
-        this.grid[lastChange.snake.newHeadPosition.x][
-          lastChange.snake.newHeadPosition.y
+      if (!coordinateOutOfBounds(lastChange.snake.newHeadPosition, this.board.height, this.board.width)) {
+        this.grid[lastChange.snake.newHeadPosition.y][
+          lastChange.snake.newHeadPosition.x
         ] = 1;
-        this.grid[lastChange.snake.prevTailPosition.x][
-          lastChange.snake.prevTailPosition.y
+        this.grid[lastChange.snake.prevTailPosition.y][
+          lastChange.snake.prevTailPosition.x
         ] = 0;
       }
 
@@ -158,8 +159,7 @@ const calcBestMove = function (
       if (logger) {
         logger.logCurrentMoveAndValue({
           move: null,
-          value: gameOverValue,
-          gameOver: true,
+          value: gameOverValue
         });
         logger.goToParent();
       }
@@ -246,7 +246,7 @@ const calcBestMove = function (
 };
 
 // Returns true if either of the two specified snakes should die from their current position
-const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, remainingDepth) => {
+const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, remainingDepth, logger) => {
   const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
   const mySnakeHead = mySnake.head;
@@ -308,18 +308,24 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, remainingDepth) => {
     // return score* (HEURISTIC_FUTURE_UNCERTAINTY_FACTOR**(MINIMAX_DEPTH - remainingDepth))
     return score;
   };
+  let score;
 
   if (mySnakeDead) {
-    return adjustForFutureUncertainty(-1000);
+    score = adjustForFutureUncertainty(-1000);
   } else if (mySnakeMaybeDead) {
-    return adjustForFutureUncertainty(-500);
+    score= adjustForFutureUncertainty(-500);
   } else if (otherSnakeMaybeDead) {
-    return adjustForFutureUncertainty(500);
+    score= adjustForFutureUncertainty(500);
   } else if (otherSnakeDead) {
-    return adjustForFutureUncertainty(1000);
+    score= adjustForFutureUncertainty(1000);
   } else {
-    return adjustForFutureUncertainty(0);
+    score= adjustForFutureUncertainty(0);
   }
+
+  if (score && logger){
+    logger.logCurrentMoveAndValue({gameOver: true})
+  }
+  return score; 
 };
 
 // Scores the given game board --> higher score if good for mySnake, lower if bad for mySnake
@@ -348,7 +354,8 @@ const evaluateBoard = (
     board,
     mySnakeID,
     otherSnakeID,
-    remainingDepth
+    remainingDepth,
+    logger
   );
   if (gameOverValue) {
     score = gameOverValue;
@@ -371,8 +378,9 @@ const evaluateBoard = (
       ((MAX_DISTANCE - closestAppleDistance) / 4) ** 2 +
       ((MAX_HEALTH - mySnake.health) / 5) ** 2;
     
+    // fix food
    foodScore *= (MAX_HEALTH - mySnake.health) / 5;
-    console.log(foodScore);
+    // console.log(foodScore);
   }
   score += foodScore;
 
@@ -396,6 +404,7 @@ const evaluateBoard = (
   }
 
   floodFillScore = cavernSize <= mySnakeLength ? -1000 : 0;
+  // console.log(floodFillScore)
   score += floodFillScore;
 
   // ********** HEURISTIC: EDGES *************
@@ -426,9 +435,10 @@ const evaluateBoard = (
 
 
   if (logger) {
-    const heuristicInfo = {
+    const heuristicInfo = {      
       Food: foodScore,
       Floodfill: floodFillScore,
+      Cavern: cavernSize,
       Edges: edgesScore,
       Corners: cornerScore,
     };

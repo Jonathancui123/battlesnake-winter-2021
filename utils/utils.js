@@ -197,6 +197,13 @@ const findClosestApple = (allFood, { x, y }) => {
   return closestApple;
 };
 
+const prettyPrintGrid = (grid) => {
+  console.log()
+  grid.forEach((row) => {
+    console.log(row.join(' '));
+  }) 
+}
+
 module.exports = {
   up,
   down,
@@ -210,5 +217,6 @@ module.exports = {
   coordinateOutOfBounds,
 	coordinatesAreEqual,
 	findClosestApple,
-	distanceToClosestCorner
+	distanceToClosestCorner,
+  prettyPrintGrid
 };

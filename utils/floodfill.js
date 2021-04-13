@@ -61,7 +61,7 @@ const largestAdjacentFloodfill = (grid, snakeHead, maxFloodfillCount) => {
       // console.log("skipped: " + JSON.stringify(tilesToCheck[i].x) + "," + JSON.stringify(tilesToCheck[i].y))
     }
   }
-  console.log(adjacentScores)
+  // console.log(adjacentScores)
   curMax = adjacentScores[0];
   for (var i = 1; i < adjacentScores.length; i++) {
     if (adjacentScores[i] > curMax) {
@@ -84,7 +84,7 @@ testgrid = [
 ]
 
 
-console.log(largestAdjacentFloodfill(testgrid, {x:2,y: 2}, 4, {x:2, y:1}));
+// console.log(largestAdjacentFloodfill(testgrid, {x:2,y: 2}, 4, {x:2, y:1}));
 
 module.exports = {
   floodfillHelper,

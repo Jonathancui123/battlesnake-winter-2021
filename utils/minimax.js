@@ -385,14 +385,14 @@ const evaluateBoard = (
       mySnakeHead,
       mySnakeLength * 2
     );
-    console.log(
-      "cavernSize for " +
-        mySnakeHead.x +
-        ", " +
-        mySnakeHead.y +
-        ":" +
-        cavernSize
-    );
+    // console.log(
+    //   "cavernSize for " +
+    //     mySnakeHead.x +
+    //     ", " +
+    //     mySnakeHead.y +
+    //     ":" +
+    //     cavernSize
+    // );
   }
 
   floodFillScore = cavernSize <= mySnakeLength ? -1000 : 0;

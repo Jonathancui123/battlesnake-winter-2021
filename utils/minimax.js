@@ -347,6 +347,12 @@ const evaluateBoard = (
   const otherSnakeHead = otherSnake.head;
   const MAX_DISTANCE = board.width + board.height;
 
+  // ********** HEURISTIC: AGGRESSION LOGIC *************
+  if (mySnake.health > otherSnake.health + 2) {
+
+  }
+
+
   // ********** HEURISTIC: KILL/DEATH *************
   // gameOverValue is -500 if mySnake might die
   // gameOverValue is -1000 if mySnake will for sure die
@@ -362,33 +368,34 @@ const evaluateBoard = (
     return score;
   }
 
-  // ********** HEURISTIC: FOOD (Health, size) *************
-  // let foodScore;
+   // ********** HEURISTIC: FOOD (Health, size) *************
+  let foodScore = 0;
   const mySnakeLength = mySnake.length;
   const closestApple = findClosestApple(board.food, mySnakeHead);
-  if (
-    mySnake.health <= 40 ||
-    (mySnakeLength < otherSnake.length + 2 && mySnakeLength < 15)
-  ) {
-    const closestAppleDistance =
-      Math.abs(mySnakeHead.x - closestApple.x) +
-      Math.abs(mySnakeHead.y - closestApple.y);
 
-    // if (logger) {
-    //   const heuristicInfo = {  
-    //     closestAppleDist: closestAppleDistance
-    //   };
-    //   logger.logHeuristicDetails(heuristicInfo);
-    // }
+  
+  if (mySnake.health <= 40 || mySnakeLength < 100) {
+    if (game.changeHistory[game.changeHistory.length - 1].snake.foodsEatenAlongPath) {
+      foodScore = 100 * game.changeHistory[game.changeHistory.length - 1].snake.foodsEatenAlongPath / 2;
+    } else {
+      const closestAppleDistance =
+        Math.abs(mySnakeHead.x - closestApple.x) +
+        Math.abs(mySnakeHead.y - closestApple.y);
 
-    foodScore =
-      ((MAX_DISTANCE - closestAppleDistance) / 4) ** 2 +
-      ((MAX_HEALTH - mySnake.health) / 5) ** 2;
-    
-    // fix food
-   foodScore *= (MAX_HEALTH - mySnake.health) / 5;
-    // console.log(foodScore);
+      // if (logger) {
+      //   const heuristicInfo = {  
+      //     closestAppleDist: closestAppleDistance
+      //   };
+      //   logger.logHeuristicDetails(heuristicInfo);
+      // }
+
+      foodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
+      // console.log(closestAppleDistance)
+      // fix food
+      // console.log(foodScore);
+    }
   }
+  // console.log(foodScore)
   score += foodScore;
 
   // ********** HEURISTIC: FLOODFILL *************

@@ -105,7 +105,6 @@ const distance = (source, dest) => {
   return distance2;
 }
 
-// TODO: determine if we want to keep track of closestCorner
 const distanceToClosestCorner = (source, board) => {
 	width = board.width;
 	shortestDistance = 100000;

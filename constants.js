@@ -1,5 +1,3 @@
-
-
 module.exports = {
   // Logger
   USE_LOGGER : false,

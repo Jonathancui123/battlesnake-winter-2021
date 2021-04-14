@@ -392,7 +392,7 @@ const evaluateBoard = (
   
   if (
     mySnake.health <= 40 ||
-    (mySnakeLength < 100)
+    (mySnakeLength < otherSnake.length + 2)
   ) {
     if (game.changeHistory[game.changeHistory.length - 1].snake.foodsEatenAlongPath) {
       foodScore = 100 * game.changeHistory[game.changeHistory.length - 1].snake.foodsEatenAlongPath / 2;
@@ -418,27 +418,27 @@ const evaluateBoard = (
   score += foodScore;
 
   // ********** HEURISTIC: FLOODFILL *************
-  // let cavernSize;
-  // let floodFillScore;
-  // if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
-  //   cavernSize = largestAdjacentFloodfill(
-  //     grid,
-  //     mySnakeHead,
-  //     mySnakeLength * 2
-  //   );
-  //   // console.log(
-  //   //   "cavernSize for " +
-  //   //     mySnakeHead.x +
-  //   //     ", " +
-  //   //     mySnakeHead.y +
-  //   //     ":" +
-  //   //     cavernSize
-  //   // );
-  // }
+  let cavernSize;
+  let floodFillScore;
+  if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
+    cavernSize = largestAdjacentFloodfill(
+      grid,
+      mySnakeHead,
+      mySnakeLength * 2
+    );
+    // console.log(
+    //   "cavernSize for " +
+    //     mySnakeHead.x +
+    //     ", " +
+    //     mySnakeHead.y +
+    //     ":" +
+    //     cavernSize
+    // );
+  }
 
-  // floodFillScore = cavernSize <= mySnakeLength ? -1000 : 0;
-  // // console.log(floodFillScore)
-  // score += floodFillScore;
+  floodFillScore = cavernSize <= mySnakeLength ? -100 : cavernSize;
+  // console.log(floodFillScore)
+  score += floodFillScore;
 
   // ********** HEURISTIC: EDGES *************
   // let edgesScore;

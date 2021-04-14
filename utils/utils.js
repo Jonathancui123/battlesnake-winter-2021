@@ -104,7 +104,6 @@ const distance = (source, dest) => {
   distance = Math.pow(source.x - dest.x, 2) + Math.pow(source.y - dest.y, 2);
 }
 
-// TODO: determine if we want to keep track of closestCorner
 const distanceToClosestCorner = (source, board) => {
 	width = board.width;
 	shortestDistance = 100000;

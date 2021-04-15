@@ -494,14 +494,14 @@ const evaluateBoard = (
   }
 
   // ********** HEURISTIC: FOOD (Health, size) *************
-  /*
+  
   let foodScore = 0;
   const closestApple = findClosestApple(board.food, mySnakeHead);
 
   if (otherSnake.health <= 40 ||
     (otherSnake.length < mySnake.length + 2)) {
     if (bottomNode.foodsWeAteAlongPath) {
-      theirFoodScore -= bottomNode.foodsTheyAteAlongPath * 100;
+      theirFoodScore -= bottomNode.foodsTheyAteAlongPath * 50;
     } else {
       const closestAppleDistance =
         Math.abs(otherSnakeHead.x - closestApple.x) +
@@ -547,7 +547,7 @@ const evaluateBoard = (
   }
   // console.log(foodScore)
   score += foodScore;
-  */
+  
 
   // // ********** HEURISTIC: FLOODFILL *************
   let cavernSize = 0;

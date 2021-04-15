@@ -101,7 +101,8 @@ const findAdjacentDirection = (source, destination) => {
 };
 
 const distance = (source, dest) => {
-  distance = Math.pow(source.x - dest.x, 2) + Math.pow(source.y - dest.y, 2);
+  distance2 = Math.pow(source.x - dest.x, 2) + Math.pow(source.y - dest.y, 2);
+  return distance2;
 }
 
 const distanceToClosestCorner = (source, board) => {
@@ -218,5 +219,6 @@ module.exports = {
 	coordinatesAreEqual,
 	findClosestApple,
 	distanceToClosestCorner,
-  prettyPrintGrid
+  prettyPrintGrid,
+  distance
 };

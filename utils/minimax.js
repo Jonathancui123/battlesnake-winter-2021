@@ -110,7 +110,9 @@ function MinimaxGame(board) {
         id: snakeID,
         newHeadPosition: newSnakeHeadCoordinate,
         prevTailPosition: snakeTailCoordinate,
-      }, oldGrid
+      }, oldGrid,
+      foodsWeAteAlongPath: foodsWeAteAlongPath,
+      foodsTheyAteAlongPath: foodsTheyAteAlongPath
       // TODO: food: describe food changes
     };
 
@@ -492,10 +494,11 @@ const evaluateBoard = (
     return score;
   }
 
-  /*
+  
   // ********** HEURISTIC: FOOD (Health, size) *************
   
   let foodScore = 0;
+  let theirFoodScore = 0;
   const closestApple = findClosestApple(board.food, mySnakeHead);
 
   if (otherSnake.health <= 40 ||
@@ -547,6 +550,7 @@ const evaluateBoard = (
   }
   // console.log(foodScore)
   score += foodScore;
+  score += theirFoodScore;
   
 
   // // ********** HEURISTIC: FLOODFILL *************
@@ -620,7 +624,9 @@ const evaluateBoard = (
   */
   if (logger) {
     const heuristicInfo = {  
-      // Food: foodScore,
+      Food: foodScore,
+      OurFoodEaten: bottomNode.foodsWeAteAlongPath,
+      TheirFoodEaten: bottomNode.foodsTheyAteAlongPath,
       Floodfill: floodFillScore,
       Cavern: cavernSize,
       // EvalNumber: numberOfTimesEvalHasBeenCalled,

@@ -466,60 +466,60 @@ const evaluateBoard = (
   }
 
   // ********** HEURISTIC: FOOD (Health, size) *************
-  // let foodScore = 0;
-  // let theirFoodScore = 0;
-  // const mySnakeLength = mySnake.length;
-  // const closestApple = findClosestApple(board.food, mySnakeHead);
+  let foodScore = 0;
+  let theirFoodScore = 0;
+  const mySnakeLength = mySnake.length;
+  const closestApple = findClosestApple(board.food, mySnakeHead);
 
-  // if (otherSnake.health <= 40 ||
-  //   (otherSnake.length < mySnake.length + 2)) {
-  //   if (bottomNode.foodsWeAteAlongPath) {
-  //     theirFoodScore -= bottomNode.foodsTheyAteAlongPath * 100;
-  //   } else {
-  //     const closestAppleDistance =
-  //       Math.abs(otherSnakeHead.x - closestApple.x) +
-  //       Math.abs(otherSnakeHead.y - closestApple.y);
+  if (otherSnake.health <= 40 ||
+    (otherSnake.length < mySnake.length + 2)) {
+    if (bottomNode.foodsWeAteAlongPath) {
+      theirFoodScore -= bottomNode.foodsTheyAteAlongPath * 100;
+    } else {
+      const closestAppleDistance =
+        Math.abs(otherSnakeHead.x - closestApple.x) +
+        Math.abs(otherSnakeHead.y - closestApple.y);
 
-  //     // if (logger) {
-  //     //   const heuristicInfo = {  
-  //     //     closestAppleDist: closestAppleDistance
-  //     //   };
-  //     //   logger.logHeuristicDetails(heuristicInfo);
-  //     // }
+      // if (logger) {
+      //   const heuristicInfo = {  
+      //     closestAppleDist: closestAppleDistance
+      //   };
+      //   logger.logHeuristicDetails(heuristicInfo);
+      // }
 
-  //     theirFoodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
-  //     // console.log(closestAppleDistance)
-  //     // fix food
-  //     // console.log(foodScore);
-  //   }
-  // }
+      theirFoodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
+      // console.log(closestAppleDistance)
+      // fix food
+      // console.log(foodScore);
+    }
+  }
     
-  // if (
-  //   mySnake.health <= 40 ||
-  //   (mySnakeLength < otherSnake.length + 2)
-  // ) {
-  //   if (bottomNode.foodsWeAteAlongPath) {
-  //     foodScore = 100 * bottomNode.foodsWeAteAlongPath;
-  //   } else {
-  //     const closestAppleDistance =
-  //       Math.abs(mySnakeHead.x - closestApple.x) +
-  //       Math.abs(mySnakeHead.y - closestApple.y);
+  if (
+    mySnake.health <= 40 ||
+    (mySnakeLength < otherSnake.length + 2)
+  ) {
+    if (bottomNode.foodsWeAteAlongPath) {
+      foodScore = 100 * bottomNode.foodsWeAteAlongPath;
+    } else {
+      const closestAppleDistance =
+        Math.abs(mySnakeHead.x - closestApple.x) +
+        Math.abs(mySnakeHead.y - closestApple.y);
 
-  //     // if (logger) {
-  //     //   const heuristicInfo = {  
-  //     //     closestAppleDist: closestAppleDistance
-  //     //   };
-  //     //   logger.logHeuristicDetails(heuristicInfo);
-  //     // }
+      // if (logger) {
+      //   const heuristicInfo = {  
+      //     closestAppleDist: closestAppleDistance
+      //   };
+      //   logger.logHeuristicDetails(heuristicInfo);
+      // }
 
-  //     foodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
-  //     // console.log(closestAppleDistance)
-  //     // fix food
-  //     // console.log(foodScore);
-  //   }
-  // }
-  // // console.log(foodScore)
-  // score += foodScore;
+      foodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
+      // console.log(closestAppleDistance)
+      // fix food
+      // console.log(foodScore);
+    }
+  }
+  // console.log(foodScore)
+  score += foodScore;
 
   // // ********** HEURISTIC: FLOODFILL *************
   // let cavernSize = 0;

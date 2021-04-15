@@ -153,7 +153,8 @@ const calcBestMove = function (
       game.board,
       mySnakeID,
       otherSnakeID,
-      remainingDepth
+      remainingDepth,
+      logger
     );
     if (gameOverValue) {
       if (logger) {
@@ -305,7 +306,7 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, remainingDepth, logg
   }
 
   const adjustForFutureUncertainty = (score) => {
-    // return score* (HEURISTIC_FUTURE_UNCERTAINTY_FACTOR**(MINIMAX_DEPTH - remainingDepth))
+    return score* (HEURISTIC_FUTURE_UNCERTAINTY_FACTOR**(MINIMAX_DEPTH - remainingDepth - 2))
     return score;
   };
   let score;
@@ -339,8 +340,8 @@ const evaluateBoard = (
 ) => {
   // range = [-1000, 1000]
   // score will only be negative if it might die
-  var score = 0;
-
+  var score = 0.5 - Math.random();
+  
   const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
   const mySnakeHead = mySnake.head;
@@ -362,6 +363,7 @@ const evaluateBoard = (
     return score;
   }
 
+  /*
   // ********** HEURISTIC: FOOD (Health, size) *************
   let foodScore = 0;
   const mySnakeLength = mySnake.length;
@@ -449,15 +451,15 @@ const evaluateBoard = (
   // cornerScore = MAX_DISTANCE - distanceToClosestCorner(otherSnakeHead, board);
   // cornerScore -= (MAX_DISTANCE - distanceToClosestCorner(mySnakeHead, board)) / 2;
   // score += cornerScore;
-
-
+  */
+  
   if (logger) {
     const heuristicInfo = {  
-      Food: foodScore,
-      Floodfill: floodFillScore,
-      Cavern: cavernSize,
-      Edges: edgesScore,
-      Corners: cornerScore,
+      // Food: foodScore,
+      // Floodfill: floodFillScore,
+      // Cavern: cavernSize,
+      // Edges: edgesScore,
+      // Corners: cornerScore,
     };
     logger.logHeuristicDetails(heuristicInfo);
   }

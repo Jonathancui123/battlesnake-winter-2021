@@ -466,6 +466,7 @@ const evaluateBoard = (
         otherSnakeNextMove = 
           distance(possibleMove1, findClosestApple(board.food, possibleMove1)) <= distance(possibleMove2, findClosestApple(board.food, possibleMove2)) 
           ? possibleMove1 : possibleMove2;
+      }
 
     // predict other snake's next move normally
     } else {

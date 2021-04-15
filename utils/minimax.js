@@ -387,6 +387,64 @@ const evaluateBoard = (
   const MAX_DISTANCE = board.width + board.height;
   const bottomNode = game.changeHistory[game.changeHistory.length - 1];
 
+  // ********** HEURISTIC: AGGRESSION LOGIC *************
+  let aggressionScore = 0;
+  let distanceToOtherSnake = 0;
+  let otherSnakeNextMove = { x: 0, y: 0 };
+  
+  // edge cases: head is going into a corner or edge
+  if (mySnake.length > otherSnake.length + 2) {
+
+    // find other snake's next move
+    const otherSnakeNeck = otherSnake.body[1];
+
+    // handle scenario if snake is currently at a corner
+    distanceToClosestCorner(otherSnakeHead, board);
+    const origin = { x: 0, y: 0};
+    const bottomRight = { x: board.width - 1, y: 0 };
+    const topLeft = { x: 0, y: board.height - 1 };
+    const topRight = { x: board.width - 1, y: board.height - 1 };
+
+    if (distanceToClosestCorner(otherSnakeHead, board) == 0) {
+      if (coordinatesAreEqual(enemySnakeHead, origin) && otherSnakeNeck.x == 1) {
+        otherSnakeNextMove = { x: 0, y: 1 };
+      } else if (coordinatesAreEqual(enemySnakeHead, origin) && otherSnakeNeck.y == 1) {
+        otherSnakeNextMove = { x: 1, y: 0 };
+      } else if (coordinatesAreEqual(enemySnakeHead, topLeft) && otherSnakeNeck.y == board.height - 2) {
+        otherSnakeNextMove = { x: 1, y: board.height - 1 };
+      } else if (coordinatesAreEqual(enemySnakeHead, topLeft) && otherSnakeNeck.x == 1) {
+        otherSnakeNextMove = { x: 0, y: board.height - 2 };
+      } else if (coordinatesAreEqual(enemySnakeHead, topRight) && otherSnakeNeck.x == board.width - 2) {
+        otherSnakeNextMove = { x: board.width - 1, y: board.height - 2 };
+      } else if (coordinatesAreEqual(enemySnakeHead, topRight) && otherSnakeNeck.y == board.height - 2) {
+        otherSnakeNextMove = { x: board.width - 2, y: board.height - 1 };
+      } else if (coordinatesAreEqual(enemySnakeHead, bottomRight) && otherSnakeNeck.x == board.width - 2) {
+        otherSnakeNextMove = { x: board.width - 1, y: 1 };
+      } else {
+        otherSnakeNextMove = { x: board.width - 2, y: 0 };
+      }
+
+    // predict other snake's next move regularily
+    } else {
+        if (otherSnakeNeck.x == otherSnakeHead.x - 1) {
+        otherSnakeNextMove = { x: otherSnakeHead.x + 1, y: otherSnakeHead.y };
+      } else if (otherSnakeNeck.x == otherSnakeHead.x + 1) {
+        otherSnakeNextMove = { x: otherSnakeHead.x - 1, y:otherSnakeHead.y };
+      } else if (otherSnakeNeck.y == otherSnakeHead.y - 1) {
+        otherSnakeNextMove = { x: otherSnakeHead.x, y: otherSnakeHead.y + 1 };
+      } else {
+        otherSnakeNextMove = { x: otherSnakeHead.x, y: otherSnakeHead.y - 1 };
+      }
+    }
+
+    distanceToOtherSnake = 
+      Math.abs(mySnakeHead.x - otherSnakeNextMove.x) +
+      Math.abs(mySnakeHead.y - otherSnakeNextMove.y);
+
+    aggressionScore = (MAX_DISTANCE - distanceToOtherSnake) * 20;
+  }
+  score += aggressionScore;
+
   // ********** HEURISTIC: KILL/DEATH *************
   // gameOverValue is -500 if mySnake might die
   // gameOverValue is -1000 if mySnake will for sure die
@@ -520,6 +578,7 @@ const evaluateBoard = (
 
   if (logger) {
     const heuristicInfo = {  
+      Aggression: aggressionScore,
       Food: foodScore,
       FoodWeAte: game.changeHistory[game.changeHistory.length - 1].foodsWeAteAlongPath,
       FoodTheyAte: game.changeHistory[game.changeHistory.length - 1].foodsTheyAteAlongPath,

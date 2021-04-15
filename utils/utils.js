@@ -101,7 +101,7 @@ const findAdjacentDirection = (source, destination) => {
 };
 
 const distance = (source, dest) => {
-  return Math.pow(source.x - dest.x, 2) + Math.pow(source.y - dest.y, 2);
+  return Math.abs(source.x - dest.x) + Math.abs(source.y - dest.y);
 }
 
 const distanceToClosestCorner = (source, board) => {

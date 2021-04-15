@@ -484,7 +484,7 @@ const evaluateBoard = (
     distanceToOtherSnake = distance(mySnakeHead,otherSnakeNextMove);
 
     if (otherSnakeNextMove.x >= 0 && otherSnakeNextMove.x <= board.width - 1 && otherSnakeNextMove.y >= 0 && otherSnakeNextMove.y <= board.height - 1) {
-      aggressionScore = Math.abs((MAX_DISTANCE - distanceToOtherSnake)) * 500;
+      aggressionScore = Math.abs((MAX_DISTANCE - distanceToOtherSnake)) * 10;
     // }
   }
   score += aggressionScore;
@@ -507,124 +507,120 @@ const evaluateBoard = (
   
   // ********** HEURISTIC: FOOD (Health, size) *************
   
-  // let foodScore = 0;
-  // let theirFoodScore = 0;
-  // const closestApple = findClosestApple(board.food, mySnakeHead);
+  let foodScore = 0;
+  let theirFoodScore = 0;
+  const closestApple = findClosestApple(board.food, mySnakeHead);
 
-  // if (otherSnake.health <= 40 ||
-  //   (otherSnake.length < mySnake.length + 2)) {
-  //   if (bottomNode.foodsWeAteAlongPath) {
-  //     theirFoodScore -= bottomNode.foodsTheyAteAlongPath * 50;
-  //   } else {
-  //     const closestAppleDistance =
-  //       Math.abs(otherSnakeHead.x - closestApple.x) +
-  //       Math.abs(otherSnakeHead.y - closestApple.y);
+  if (otherSnake.health <= 40 ||
+    (otherSnake.length < mySnake.length + 2)) {
+    if (bottomNode.foodsWeAteAlongPath) {
+      theirFoodScore -= bottomNode.foodsTheyAteAlongPath * 50;
+    } else {
+      const closestAppleDistance =
+        Math.abs(otherSnakeHead.x - closestApple.x) +
+        Math.abs(otherSnakeHead.y - closestApple.y);
 
-  //     // if (logger) {
-  //     //   const heuristicInfo = {  
-  //     //     closestAppleDist: closestAppleDistance
-  //     //   };
-  //     //   logger.logHeuristicDetails(heuristicInfo);
-  //     // }
+      // if (logger) {
+      //   const heuristicInfo = {  
+      //     closestAppleDist: closestAppleDistance
+      //   };
+      //   logger.logHeuristicDetails(heuristicInfo);
+      // }
 
-  //     theirFoodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
-  //     // console.log(closestAppleDistance)
-  //     // fix food
-  //     // console.log(foodScore);
-  //   }
-  // }
+      theirFoodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
+      // console.log(closestAppleDistance)
+      // fix food
+      // console.log(foodScore);
+    }
+  }
     
-  // if (
-  //   mySnake.health <= 40 ||
-  //   (mySnakeLength < otherSnake.length + 2)
-  // ) {
-  //   if (bottomNode.foodsWeAteAlongPath) {
-  //     foodScore = 100 * bottomNode.foodsWeAteAlongPath;
-  //   } else {
-  //     const closestAppleDistance =
-  //       Math.abs(mySnakeHead.x - closestApple.x) +
-  //       Math.abs(mySnakeHead.y - closestApple.y);
+  if (mySnake.health <= 40 || (mySnakeLength < otherSnake.length + 2)) {
+    if (bottomNode.foodsWeAteAlongPath) {
+      foodScore = 100 * bottomNode.foodsWeAteAlongPath;
+    } else {
+      const closestAppleDistance =
+        Math.abs(mySnakeHead.x - closestApple.x) +
+        Math.abs(mySnakeHead.y - closestApple.y);
 
-  //     // if (logger) {
-  //     //   const heuristicInfo = {  
-  //     //     closestAppleDist: closestAppleDistance
-  //     //   };
-  //     //   logger.logHeuristicDetails(heuristicInfo);
-  //     // }
+      // if (logger) {
+      //   const heuristicInfo = {  
+      //     closestAppleDist: closestAppleDistance
+      //   };
+      //   logger.logHeuristicDetails(heuristicInfo);
+      // }
 
-  //     foodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
-  //     // console.log(closestAppleDistance)
-  //     // fix food
-  //     // console.log(foodScore);
-  //   }
-  // }
-  // // console.log(foodScore)
-  // score += foodScore;
-  // score += theirFoodScore;
-  
+      foodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
+      // console.log(closestAppleDistance)
+      // fix food
+      // console.log(foodScore);
+    }
+  }
+  // console.log(foodScore)
+  score += foodScore;
+  score += theirFoodScore;
 
   // // ********** HEURISTIC: FLOODFILL *************
-  // let cavernSize = 0;
-  // let floodFillScore = 0;
+  let cavernSize = 0;
+  let floodFillScore = 0;
 
-  // if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
-  //   cavernSize = largestAdjacentFloodfill(
-  //     grid,
-  //     mySnakeHead,
-  //     HEURISTIC_SAFE_CAVERN_SIZE* mySnakeLength
-  //   );
-  //   // console.log(
-  //   //   "cavernSize for " +
-  //   //     mySnakeHead.x +
-  //   //     ", " +
-  //   //     mySnakeHead.y +
-  //   //     ":" +
-  //   //     cavernSize
-  //   // );
-  // }
+  if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
+    cavernSize = largestAdjacentFloodfill(
+      grid,
+      mySnakeHead,
+      HEURISTIC_SAFE_CAVERN_SIZE* mySnakeLength
+    );
+    // console.log(
+    //   "cavernSize for " +
+    //     mySnakeHead.x +
+    //     ", " +
+    //     mySnakeHead.y +
+    //     ":" +
+    //     cavernSize
+    // );
+  }
 
-  // // Logic on google docs
-  // if (cavernSize >= HEURISTIC_SAFE_CAVERN_SIZE * mySnakeLength) {
-  //   // Safe..
-  //   // Due to the floodfill stopping point, the largest cavernSize should be HEURISTIC_SAFE_CAVERN_SIZE * mySnakeLength
-  //   floodFillScore = 0;
-  // } else {
-  //   // calculate floodfillscore, based on google doc
-  //   floodFillScore = (((HEURISTIC_MAX_FLOODFILL_SCORE - HEURISTIC_MIN_FLOODFILL_SCORE) / Math.sqrt(HEURISTIC_SAFE_CAVERN_SIZE* HEURISTIC_LARGEST_CONCIEVABLE_SNAKE))* Math.sqrt(cavernSize)) - HEURISTIC_MAX_FLOODFILL_SCORE
-  // }
-  // // floodfill score is a NEGATIVE NUMBER between negative HEURISTIC_MAX_FLOODFILL_SCORE and zero
-  // score += floodFillScore;
+  // Logic on google docs
+  if (cavernSize >= HEURISTIC_SAFE_CAVERN_SIZE * mySnakeLength) {
+    // Safe..
+    // Due to the floodfill stopping point, the largest cavernSize should be HEURISTIC_SAFE_CAVERN_SIZE * mySnakeLength
+    floodFillScore = 0;
+  } else {
+    // calculate floodfillscore, based on google doc
+    floodFillScore = (((HEURISTIC_MAX_FLOODFILL_SCORE - HEURISTIC_MIN_FLOODFILL_SCORE) / Math.sqrt(HEURISTIC_SAFE_CAVERN_SIZE* HEURISTIC_LARGEST_CONCIEVABLE_SNAKE))* Math.sqrt(cavernSize)) - HEURISTIC_MAX_FLOODFILL_SCORE
+  }
+  // floodfill score is a NEGATIVE NUMBER between negative HEURISTIC_MAX_FLOODFILL_SCORE and zero
+  score += floodFillScore;
   
   // ********** HEURISTIC: EDGES *************
   /*
   let edgesScore = 0;
 
-  // let outerBound = 200;
-  // let secondOuterBound = 100;
+  let outerBound = 200;
+  let secondOuterBound = 100;
 
-  // // the closer our snake is to the edge, the worse it is
-  // if (mySnakeHead.x == 0 || mySnakeHead.x == board.width - 1 ||
-  //     mySnakeHead.y == 0 || mySnakeHead.y == board.height -1) {
-  //   edgesScore -= outerBound;
-  // }
+  // the closer our snake is to the edge, the worse it is
+  if (mySnakeHead.x == 0 || mySnakeHead.x == board.width - 1 ||
+      mySnakeHead.y == 0 || mySnakeHead.y == board.height -1) {
+    edgesScore -= outerBound;
+  }
 
-  // if (mySnakeHead.x == 1 || mySnakeHead.x == board.width - 2 ||
-  //     mySnakeHead.y == 1 || mySnakeHead.y == board.height -2) {
-  //   edgesScore -= secondOuterBound;
-  // }
+  if (mySnakeHead.x == 1 || mySnakeHead.x == board.width - 2 ||
+      mySnakeHead.y == 1 || mySnakeHead.y == board.height -2) {
+    edgesScore -= secondOuterBound;
+  }
 
-  // // the closer enemy snake is to the edge, the better
-  // if (otherSnakeHead.x == 0 || otherSnakeHead.x == board.width - 1 ||
-  //     otherSnakeHead.y == 0 || otherSnakeHead.y == board.height -1) {
-  //   edgesScore += outerBound;
-  // }
+  // the closer enemy snake is to the edge, the better
+  if (otherSnakeHead.x == 0 || otherSnakeHead.x == board.width - 1 ||
+      otherSnakeHead.y == 0 || otherSnakeHead.y == board.height -1) {
+    edgesScore += outerBound;
+  }
 
-  // if (otherSnakeHead.x == 1 || otherSnakeHead.x == board.width - 2 ||
-  //     otherSnakeHead.y == 1 || otherSnakeHead.y == board.height -2) {
-  //   edgesScore += secondOuterBound;
-  // }
+  if (otherSnakeHead.x == 1 || otherSnakeHead.x == board.width - 2 ||
+      otherSnakeHead.y == 1 || otherSnakeHead.y == board.height -2) {
+    edgesScore += secondOuterBound;
+  }
 
-  // score += edgesScore;
+  score += edgesScore;
 
   // // ********** HEURISTIC: CORNERS *************
   // let cornerScore;
@@ -634,14 +630,15 @@ const evaluateBoard = (
   */
   if (logger) {
     const heuristicInfo = {  
-      // Food: foodScore,
-      // OurFoodEaten: bottomNode.foodsWeAteAlongPath,
-      // TheirFoodEaten: bottomNode.foodsTheyAteAlongPath,
-      // Floodfill: floodFillScore,
-      // Cavern: cavernSize,
-      Distance: distanceToOtherSnake,
+      Food: foodScore,
+      OurFoodEaten: bottomNode.foodsWeAteAlongPath,
+      TheirFoodEaten: bottomNode.foodsTheyAteAlongPath,
+      Floodfill: floodFillScore,
+      Cavern: cavernSize,
+      AggressionDistance: distanceToOtherSnake,
       Aggression: aggressionScore,
-      // EvalNumber: numberOfTimesEvalHasBeenCalled,
+      NextMove: otherSnakeNextMove,
+      EvalNumber: numberOfTimesEvalHasBeenCalled,
       // Edges: edgesScore,
       // Corners: cornerScore,
     };

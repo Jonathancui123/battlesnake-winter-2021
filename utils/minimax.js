@@ -388,62 +388,67 @@ const evaluateBoard = (
   const bottomNode = game.changeHistory[game.changeHistory.length - 1];
 
   // ********** HEURISTIC: AGGRESSION LOGIC *************
-  let aggressionScore = 0;
-  let distanceToOtherSnake = 0;
-  let otherSnakeNextMove = { x: 0, y: 0 };
+  // let aggressionScore = 0;
+  // let distanceToOtherSnake = 0;
+  // let otherSnakeNextMove = { x: 0, y: 0 };
   
-  // edge cases: head is going into a corner or edge
-  if (mySnake.length > otherSnake.length + 2) {
+  // // edge cases: head is going into a corner or edge
+  // // if (mySnake.length >= otherSnake.length + 2) {
 
-    // find other snake's next move
-    const otherSnakeNeck = otherSnake.body[1];
+  //   // find other snake's next move
+  //   const otherSnakeNeck = otherSnake.body[1];
 
-    // handle scenario if snake is currently at a corner
-    distanceToClosestCorner(otherSnakeHead, board);
-    const origin = { x: 0, y: 0};
-    const bottomRight = { x: board.width - 1, y: 0 };
-    const topLeft = { x: 0, y: board.height - 1 };
-    const topRight = { x: board.width - 1, y: board.height - 1 };
+  //   // handle scenario if snake is currently at a corner
+  //   distanceToClosestCorner(otherSnakeHead, board);
+  //   const origin = { x: 0, y: 0};
+  //   const bottomRight = { x: board.width - 1, y: 0 };
+  //   const topLeft = { x: 0, y: board.height - 1 };
+  //   const topRight = { x: board.width - 1, y: board.height - 1 };
 
-    if (distanceToClosestCorner(otherSnakeHead, board) == 0) {
-      if (coordinatesAreEqual(enemySnakeHead, origin) && otherSnakeNeck.x == 1) {
-        otherSnakeNextMove = { x: 0, y: 1 };
-      } else if (coordinatesAreEqual(enemySnakeHead, origin) && otherSnakeNeck.y == 1) {
-        otherSnakeNextMove = { x: 1, y: 0 };
-      } else if (coordinatesAreEqual(enemySnakeHead, topLeft) && otherSnakeNeck.y == board.height - 2) {
-        otherSnakeNextMove = { x: 1, y: board.height - 1 };
-      } else if (coordinatesAreEqual(enemySnakeHead, topLeft) && otherSnakeNeck.x == 1) {
-        otherSnakeNextMove = { x: 0, y: board.height - 2 };
-      } else if (coordinatesAreEqual(enemySnakeHead, topRight) && otherSnakeNeck.x == board.width - 2) {
-        otherSnakeNextMove = { x: board.width - 1, y: board.height - 2 };
-      } else if (coordinatesAreEqual(enemySnakeHead, topRight) && otherSnakeNeck.y == board.height - 2) {
-        otherSnakeNextMove = { x: board.width - 2, y: board.height - 1 };
-      } else if (coordinatesAreEqual(enemySnakeHead, bottomRight) && otherSnakeNeck.x == board.width - 2) {
-        otherSnakeNextMove = { x: board.width - 1, y: 1 };
-      } else {
-        otherSnakeNextMove = { x: board.width - 2, y: 0 };
-      }
+  //   if (distanceToClosestCorner(otherSnakeHead, board) == 0) {
+  //     if (coordinatesAreEqual(otherSnakeHead, origin) && otherSnakeNeck.x == 1) {
+  //       otherSnakeNextMove = { x: 0, y: 1 };
+  //     } else if (coordinatesAreEqual(otherSnakeHead, origin) && otherSnakeNeck.y == 1) {
+  //       otherSnakeNextMove = { x: 1, y: 0 };
+  //     } else if (coordinatesAreEqual(otherSnakeHead, topLeft) && otherSnakeNeck.y == board.height - 2) {
+  //       otherSnakeNextMove = { x: 1, y: board.height - 1 };
+  //     } else if (coordinatesAreEqual(otherSnakeHead, topLeft) && otherSnakeNeck.x == 1) {
+  //       otherSnakeNextMove = { x: 0, y: board.height - 2 };
+  //     } else if (coordinatesAreEqual(otherSnakeHead, topRight) && otherSnakeNeck.x == board.width - 2) {
+  //       otherSnakeNextMove = { x: board.width - 1, y: board.height - 2 };
+  //     } else if (coordinatesAreEqual(otherSnakeHead, topRight) && otherSnakeNeck.y == board.height - 2) {
+  //       otherSnakeNextMove = { x: board.width - 2, y: board.height - 1 };
+  //     } else if (coordinatesAreEqual(otherSnakeHead, bottomRight) && otherSnakeNeck.x == board.width - 2) {
+  //       otherSnakeNextMove = { x: board.width - 1, y: 1 };
+  //     } else {
+  //       otherSnakeNextMove = { x: board.width - 2, y: 0 };
+  //     }
 
-    // predict other snake's next move regularily
-    } else {
-        if (otherSnakeNeck.x == otherSnakeHead.x - 1) {
-        otherSnakeNextMove = { x: otherSnakeHead.x + 1, y: otherSnakeHead.y };
-      } else if (otherSnakeNeck.x == otherSnakeHead.x + 1) {
-        otherSnakeNextMove = { x: otherSnakeHead.x - 1, y:otherSnakeHead.y };
-      } else if (otherSnakeNeck.y == otherSnakeHead.y - 1) {
-        otherSnakeNextMove = { x: otherSnakeHead.x, y: otherSnakeHead.y + 1 };
-      } else {
-        otherSnakeNextMove = { x: otherSnakeHead.x, y: otherSnakeHead.y - 1 };
-      }
-    }
+  //   // predict other snake's next move regularily
+  //   } else {
+  //       if (otherSnakeNeck.x == otherSnakeHead.x - 1) {
+  //       otherSnakeNextMove = { x: otherSnakeHead.x + 1, y: otherSnakeHead.y };
+  //     } else if (otherSnakeNeck.x == otherSnakeHead.x + 1) {
+  //       otherSnakeNextMove = { x: otherSnakeHead.x - 1, y:otherSnakeHead.y };
+  //     } else if (otherSnakeNeck.y == otherSnakeHead.y - 1) {
+  //       otherSnakeNextMove = { x: otherSnakeHead.x, y: otherSnakeHead.y + 1 };
+  //     } else {
+  //       otherSnakeNextMove = { x: otherSnakeHead.x, y: otherSnakeHead.y - 1 };
+  //     }
+  //   }
 
-    distanceToOtherSnake = 
-      Math.abs(mySnakeHead.x - otherSnakeNextMove.x) +
-      Math.abs(mySnakeHead.y - otherSnakeNextMove.y);
+  //   distanceToOtherSnake = 
+  //     Math.abs(mySnakeHead.x - otherSnakeNextMove.x) +
+  //     Math.abs(mySnakeHead.y - otherSnakeNextMove.y);
+    
 
-    aggressionScore = (MAX_DISTANCE - distanceToOtherSnake) * 20;
-  }
-  score += aggressionScore;
+  //   // TODO: check if other snake is at an edge
+  //   if (otherSnakeNextMove.x >= 0 && otherSnakeNextMove.x <= board.width - 1 && 
+  //   otherSnakeNextMove.y >= 0 && otherSnakeNextMove.y <= board.height - 1) {
+  //     aggressionScore = (MAX_DISTANCE - distanceToOtherSnake) * 20;
+  //   // }
+  // }
+  // score += aggressionScore;
 
   // ********** HEURISTIC: KILL/DEATH *************
   // gameOverValue is -500 if mySnake might die
@@ -461,60 +466,60 @@ const evaluateBoard = (
   }
 
   // ********** HEURISTIC: FOOD (Health, size) *************
-  let foodScore = 0;
-  let theirFoodScore = 0;
-  const mySnakeLength = mySnake.length;
-  const closestApple = findClosestApple(board.food, mySnakeHead);
+  // let foodScore = 0;
+  // let theirFoodScore = 0;
+  // const mySnakeLength = mySnake.length;
+  // const closestApple = findClosestApple(board.food, mySnakeHead);
 
-  if (otherSnake.health <= 40 ||
-    (otherSnake.length < mySnake.length + 2)) {
-    if (bottomNode.foodsWeAteAlongPath) {
-      theirFoodScore -= bottomNode.foodsTheyAteAlongPath * 100;
-    } else {
-      const closestAppleDistance =
-        Math.abs(otherSnakeHead.x - closestApple.x) +
-        Math.abs(otherSnakeHead.y - closestApple.y);
+  // if (otherSnake.health <= 40 ||
+  //   (otherSnake.length < mySnake.length + 2)) {
+  //   if (bottomNode.foodsWeAteAlongPath) {
+  //     theirFoodScore -= bottomNode.foodsTheyAteAlongPath * 100;
+  //   } else {
+  //     const closestAppleDistance =
+  //       Math.abs(otherSnakeHead.x - closestApple.x) +
+  //       Math.abs(otherSnakeHead.y - closestApple.y);
 
-      // if (logger) {
-      //   const heuristicInfo = {  
-      //     closestAppleDist: closestAppleDistance
-      //   };
-      //   logger.logHeuristicDetails(heuristicInfo);
-      // }
+  //     // if (logger) {
+  //     //   const heuristicInfo = {  
+  //     //     closestAppleDist: closestAppleDistance
+  //     //   };
+  //     //   logger.logHeuristicDetails(heuristicInfo);
+  //     // }
 
-      theirFoodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
-      // console.log(closestAppleDistance)
-      // fix food
-      // console.log(foodScore);
-    }
-  }
+  //     theirFoodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
+  //     // console.log(closestAppleDistance)
+  //     // fix food
+  //     // console.log(foodScore);
+  //   }
+  // }
     
-  if (
-    mySnake.health <= 40 ||
-    (mySnakeLength < otherSnake.length + 2)
-  ) {
-    if (bottomNode.foodsWeAteAlongPath) {
-      foodScore = 100 * bottomNode.foodsWeAteAlongPath;
-    } else {
-      const closestAppleDistance =
-        Math.abs(mySnakeHead.x - closestApple.x) +
-        Math.abs(mySnakeHead.y - closestApple.y);
+  // if (
+  //   mySnake.health <= 40 ||
+  //   (mySnakeLength < otherSnake.length + 2)
+  // ) {
+  //   if (bottomNode.foodsWeAteAlongPath) {
+  //     foodScore = 100 * bottomNode.foodsWeAteAlongPath;
+  //   } else {
+  //     const closestAppleDistance =
+  //       Math.abs(mySnakeHead.x - closestApple.x) +
+  //       Math.abs(mySnakeHead.y - closestApple.y);
 
-      // if (logger) {
-      //   const heuristicInfo = {  
-      //     closestAppleDist: closestAppleDistance
-      //   };
-      //   logger.logHeuristicDetails(heuristicInfo);
-      // }
+  //     // if (logger) {
+  //     //   const heuristicInfo = {  
+  //     //     closestAppleDist: closestAppleDistance
+  //     //   };
+  //     //   logger.logHeuristicDetails(heuristicInfo);
+  //     // }
 
-      foodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
-      // console.log(closestAppleDistance)
-      // fix food
-      // console.log(foodScore);
-    }
-  }
-  // console.log(foodScore)
-  score += foodScore;
+  //     foodScore = ((MAX_DISTANCE - closestAppleDistance) / 4)**2
+  //     // console.log(closestAppleDistance)
+  //     // fix food
+  //     // console.log(foodScore);
+  //   }
+  // }
+  // // console.log(foodScore)
+  // score += foodScore;
 
   // // ********** HEURISTIC: FLOODFILL *************
   // let cavernSize = 0;
@@ -579,10 +584,10 @@ const evaluateBoard = (
   if (logger) {
     const heuristicInfo = {  
       Aggression: aggressionScore,
-      Food: foodScore,
-      FoodWeAte: game.changeHistory[game.changeHistory.length - 1].foodsWeAteAlongPath,
-      FoodTheyAte: game.changeHistory[game.changeHistory.length - 1].foodsTheyAteAlongPath,
-      bobby: 4
+      //Food: foodScore,
+      //FoodWeAte: game.changeHistory[game.changeHistory.length - 1].foodsWeAteAlongPath,
+      //FoodTheyAte: game.changeHistory[game.changeHistory.length - 1].foodsTheyAteAlongPath,
+     // bobby: 4
       // Floodfill: floodFillScore,
       // Cavern: cavernSize,
       // Edges: edgesScore,

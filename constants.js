@@ -1,5 +1,3 @@
-
-
 module.exports = {
   // Logger
   USE_LOGGER : true,
@@ -21,4 +19,11 @@ module.exports = {
   MAX_HEALTH: 100,
   // Heuristics:
   HEURISTIC_FUTURE_UNCERTAINTY_FACTOR: 0.87,
+
+  HEURISTIC_SAFE_CAVERN_SIZE: 2, // How many times bigger the cavern must be than our snake to be considered “safe”
+  // HEURISTIC_MIN_FLOODFILL_SCORE and HEURISTIC_MAX_FLOODFILL_SCORE should both be POSITIVE NUMBERS!
+  HEURISTIC_MIN_FLOODFILL_SCORE: 25, // The score we wish to assign to a cavern that is "barely unsafe" for the "largest conceivable snake"
+  HEURISTIC_MAX_FLOODFILL_SCORE: 100, // The score we wish to assign to a cavern that is of size 0 (maximally unsafe)
+  HEURISTIC_LARGEST_CONCIEVABLE_SNAKE: 30, // How big can our snake possibly get? Affects how fast we go from MAX_FLOODFILL_SCORE to MIN_FLOODFILL_SCORE
+
 }

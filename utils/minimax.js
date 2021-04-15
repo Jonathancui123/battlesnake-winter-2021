@@ -6,8 +6,11 @@ const {
   boardToGrid,
   findClosestApple,
   distanceToClosestCorner,
-  prettyPrintGrid
+  prettyPrintGrid,
+  gridToString
 } = require("./utils");
+
+var numberOfTimesEvalHasBeenCalled = 0;
 
 const { largestAdjacentFloodfill } = require("./floodfill");
 
@@ -17,12 +20,17 @@ const {
   MINIMAX_DEPTH,
   MAX_HEALTH,
   HEURISTIC_FUTURE_UNCERTAINTY_FACTOR,
+  HEURISTIC_SAFE_CAVERN_SIZE,
+  HEURISTIC_MIN_FLOODFILL_SCORE,
+  HEURISTIC_MAX_FLOODFILL_SCORE,
+  HEURISTIC_LARGEST_CONCIEVABLE_SNAKE,
 } = require("../constants");
 
 // TODO: Fix "off by one error"
 // Game object which represents the board: (explanation: https://www.w3schools.com/js/js_object_constructors.asp)
 // Supports methods for modifying the board, undoing modifications, and getting potential moves
 function MinimaxGame(board) {
+  numberOfTimesEvalHasBeenCalled = 0;
   // The state of the board at the current node of Minimax simulation
   // Battlesnake API board object
   this.board = board;
@@ -30,7 +38,7 @@ function MinimaxGame(board) {
   // this.grid is a 2D array where the outer array indices are vertical from one another, and inner array indices are horizontal from one another
   // i.e. this.grid[y][x]
   this.grid = boardToGrid(this.board);
-  prettyPrintGrid(this.grid)
+  // prettyPrintGrid(this.grid)
 
   // Somehow keep track of the board changes so we can undo moves, or simply store all previous board positions
   this.changeHistory = [];
@@ -50,7 +58,17 @@ function MinimaxGame(board) {
       snakeHeadCoordinate,
       moveDirection
     );
-    const snakeTailCoordinate = currentSnake.body[currentSnake.body.length - 1];
+    const snakeTailCoordinate = {...currentSnake.body[currentSnake.body.length - 1]};
+
+    // Object describes the numbers in the grid at the prevTailPosition and the newHeadPosition
+    const oldGrid = {
+      prevTailPosition: this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y]
+    }
+    if (
+     !coordinateOutOfBounds(newSnakeHeadCoordinate, this.board.height, this.board.width)
+    ) {
+      oldGrid.newHeadPosition = this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y]
+    }
 
     // Create an object that describes the changes to the board on this move
     const newChange = {
@@ -58,21 +76,16 @@ function MinimaxGame(board) {
         id: snakeID,
         newHeadPosition: newSnakeHeadCoordinate,
         prevTailPosition: snakeTailCoordinate,
-      },
+      }, oldGrid
       // TODO: food: describe food changes
     };
-
-    // Grid Changes for floodFill
-    // TODO: undo function for grid, account for food changes
-
-
 
     if (
      !coordinateOutOfBounds(newSnakeHeadCoordinate, this.board.height, this.board.width)
     ) {
       this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y] = 0;
-      this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
     }
+    this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
 
     this.changeHistory.push(newChange);
     // 'currentSnake' object is referencing an object in "this.board"
@@ -91,26 +104,29 @@ function MinimaxGame(board) {
   // Undo the move at the top of the change history
   this.undo = function () {
     const lastChange = this.changeHistory.pop();
-    if (lastChange.snake !== undefined) {
-      const currentSnake = this.board.snakes.find(
-        (snake) => snake.id === lastChange.snake.id
-      );
+    
+    const currentSnake = this.board.snakes.find(
+      (snake) => snake.id === lastChange.snake.id
+    );
 
-      // Adjustment for grid floodfill
-      if (!coordinateOutOfBounds(lastChange.snake.newHeadPosition, this.board.height, this.board.width)) {
-        this.grid[lastChange.snake.newHeadPosition.x][
-          lastChange.snake.newHeadPosition.y
-        ] = 1;
-        this.grid[lastChange.snake.prevTailPosition.x][
-          lastChange.snake.prevTailPosition.y
-        ] = 0;
-      }
-
-      // Opposite order of modifications made in move() method
-      currentSnake.body.push(lastChange.snake.prevTailPosition);
-      currentSnake.body.shift(); // .shift() gets rid of the first element of an array
-      currentSnake.head = { ...currentSnake.body[0] }; // copy of head (don't reference)
+    // Adjustment for grid floodfill
+    this.grid[lastChange.snake.prevTailPosition.x][
+      lastChange.snake.prevTailPosition.y
+    ] = lastChange.oldGrid.prevTailPosition;
+    if (lastChange.oldGrid.newHeadPosition !== undefined) {
+      this.grid[lastChange.snake.newHeadPosition.x][
+        lastChange.snake.newHeadPosition.y
+      ] = lastChange.oldGrid.newHeadPosition;
     }
+
+    // check if the head is currently on a snakes body. If it is,
+    // don't bother undoing that head position on the grid.
+  
+    // Opposite order of modifications made in move() method
+    currentSnake.body.push(lastChange.snake.prevTailPosition);
+   
+    currentSnake.body.shift(); // .shift() gets rid of the first element of an array
+    currentSnake.head = { ...currentSnake.body[0] }; // copy of head (don't reference)
   };
 }
 
@@ -128,6 +144,16 @@ const calcBestMove = function (
   beta = Number.POSITIVE_INFINITY,
   isMaximizingPlayer = true
 ) {
+
+  const gridString = gridToString(game.grid);
+
+  if (logger) {
+    const heuristicInfo = {  
+      Grid: gridString,
+    };
+    logger.logHeuristicDetails(heuristicInfo);
+  }
+
   // Base case: evaluate board at maximum depth
   if (remainingDepth === 0) {
     value = evaluateBoard(
@@ -341,9 +367,14 @@ const evaluateBoard = (
   // score will only be negative if it might die
   var score = 0;
 
+  // console.log(numberOfTimesEvalHasBeenCalled);
+  // prettyPrintGrid(grid);  
+  // numberOfTimesEvalHasBeenCalled++;
+
   const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
   const mySnakeHead = mySnake.head;
+  const mySnakeLength = mySnake.length;
   const otherSnakeHead = otherSnake.head;
   const MAX_DISTANCE = board.width + board.height;
 
@@ -363,8 +394,8 @@ const evaluateBoard = (
   }
 
   // ********** HEURISTIC: FOOD (Health, size) *************
+  /*
   let foodScore = 0;
-  const mySnakeLength = mySnake.length;
   const closestApple = findClosestApple(board.food, mySnakeHead);
   if (
     mySnake.health <= 40 ||
@@ -390,15 +421,17 @@ const evaluateBoard = (
     // console.log(foodScore);
   }
   score += foodScore;
+  */
 
   // // ********** HEURISTIC: FLOODFILL *************
   let cavernSize = 0;
   let floodFillScore = 0;
+
   if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
     cavernSize = largestAdjacentFloodfill(
       grid,
       mySnakeHead,
-      mySnakeLength * 2
+      HEURISTIC_SAFE_CAVERN_SIZE* mySnakeLength
     );
     // console.log(
     //   "cavernSize for " +
@@ -410,11 +443,20 @@ const evaluateBoard = (
     // );
   }
 
-  floodFillScore = cavernSize <= mySnakeLength ? -1000 : 0;
-  // console.log(floodFillScore)
+  // Logic on google docs
+  if (cavernSize >= HEURISTIC_SAFE_CAVERN_SIZE * mySnakeLength) {
+    // Safe..
+    // Due to the floodfill stopping point, the largest cavernSize should be HEURISTIC_SAFE_CAVERN_SIZE * mySnakeLength
+    floodFillScore = 0;
+  } else {
+    // calculate floodfillscore, based on google doc
+    floodFillScore = (((HEURISTIC_MAX_FLOODFILL_SCORE - HEURISTIC_MIN_FLOODFILL_SCORE) / Math.sqrt(HEURISTIC_SAFE_CAVERN_SIZE* HEURISTIC_LARGEST_CONCIEVABLE_SNAKE))* Math.sqrt(cavernSize)) - HEURISTIC_MAX_FLOODFILL_SCORE
+  }
+  // floodfill score is a NEGATIVE NUMBER between negative HEURISTIC_MAX_FLOODFILL_SCORE and zero
   score += floodFillScore;
   
   // ********** HEURISTIC: EDGES *************
+  /*
   let edgesScore = 0;
 
   let outerBound = 200;
@@ -450,14 +492,15 @@ const evaluateBoard = (
   // cornerScore -= (MAX_DISTANCE - distanceToClosestCorner(mySnakeHead, board)) / 2;
   // score += cornerScore;
 
-
+  */
   if (logger) {
     const heuristicInfo = {  
-      Food: foodScore,
+      // Food: foodScore,
       Floodfill: floodFillScore,
       Cavern: cavernSize,
-      Edges: edgesScore,
-      Corners: cornerScore,
+      // EvalNumber: numberOfTimesEvalHasBeenCalled,
+      // Edges: edgesScore,
+      // Corners: cornerScore,
     };
     logger.logHeuristicDetails(heuristicInfo);
   }

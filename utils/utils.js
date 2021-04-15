@@ -68,8 +68,8 @@ const adjacentTiles = ({ x, y }, height, width) => {
 
 const boardToGrid = (board) => {
   var value = 1; // by default
-  var myGrid = [...Array(11)].map((e) =>
-    Array(11).fill(value)
+  var myGrid = [...Array(board.height)].map((e) =>
+    Array(board.width).fill(value)
   );
   const snakes = board.snakes;
   snakes.forEach((snake) => {
@@ -203,6 +203,45 @@ const prettyPrintGrid = (grid) => {
   }) 
 }
 
+const transposeArray = (array, arrayLength) =>{
+    var newArray = [];
+    for(var i = 0; i < array.length; i++){
+        newArray.push([]);
+    };
+
+    for(var i = 0; i < array.length; i++){
+        for(var j = 0; j < arrayLength; j++){
+            newArray[j].push(array[i][j]);
+        };
+    };
+
+    return newArray;
+}
+
+const gridToString = (grid) => {
+
+  var transposedGrid = [...Array(11)].map((e) =>
+    Array(11).fill(8)
+  );
+  var i;
+  for (i=10; i >= 0; i--){
+    var j;
+    for (j =0; j < 11; j++){
+      transposedGrid[10-i][j] = grid[j][i]
+    }
+  }
+  
+  var stringGrid = [...Array(11)]
+  var k;
+  for (k = 0; k < 11; k++){
+    stringGrid[k] = transposedGrid[k].join('')
+  }
+
+  const finalString = "\n" + stringGrid.join('\n')
+
+  return finalString;
+}
+
 module.exports = {
   up,
   down,
@@ -217,5 +256,6 @@ module.exports = {
 	coordinatesAreEqual,
 	findClosestApple,
 	distanceToClosestCorner,
-  prettyPrintGrid
+  prettyPrintGrid,
+  gridToString
 };

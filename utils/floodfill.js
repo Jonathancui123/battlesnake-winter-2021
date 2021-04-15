@@ -41,13 +41,11 @@ const floodfillHelper = (grid, x, y, maxFloodfillCount, visited) => {
 }
 
 const largestAdjacentFloodfill = (grid, snakeHead, maxFloodfillCount) => {
-  tilesToCheck = adjacentTiles(snakeHead, 11, 11);
-  for (var i = 0; i < tilesToCheck.length; i ++){
-    if (coordinateOutOfBounds(tilesToCheck[i], 11, 11)) {
-      tilesToCheck.splice(i, 1);
-      i--;
-    }
-  }
+  const gridHeight = grid[0].length
+  const gridWidth = grid.length
+
+  // tilesToCheck are all within bounds
+  tilesToCheck = adjacentTiles(snakeHead, gridHeight, gridWidth);
   visited = {}
 
   let adjacentScores = [];
@@ -75,16 +73,22 @@ const isSafe = (board, x, y) => {
   return 0 <= x && x < board.length && 0 <= y && y < board.length && board[x][y] == 1;
 }
 
-testgrid = [
-  [0, 1, 1, 1, 0],
-  [1, 0, 0, 1, 1],
-  [1, 1, 1, 0, 0],
-  [1, 1, 1, 0, 1],
-  [0, 0, 0, 1, 1]
-]
+// testgrid = [
+// [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+// [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+// [1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0],
+// [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+// [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+// [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+// [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+// [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+// [1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1],
+// [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1],
+// [0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1],
+// ]
 
 
-// console.log(largestAdjacentFloodfill(testgrid, {x:2,y: 2}, 4, {x:2, y:1}));
+// console.log(largestAdjacentFloodfill(testgrid, {x:10,y: 1}, 32));
 
 module.exports = {
   floodfillHelper,

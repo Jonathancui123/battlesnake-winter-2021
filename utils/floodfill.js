@@ -41,9 +41,9 @@ const floodfillHelper = (grid, x, y, maxFloodfillCount, visited) => {
 }
 
 const largestAdjacentFloodfill = (grid, snakeHead, maxFloodfillCount) => {
-  tilesToCheck = adjacentTiles(snakeHead, 10, 10);
+  tilesToCheck = adjacentTiles(snakeHead, 11, 11);
   for (var i = 0; i < tilesToCheck.length; i ++){
-    if (coordinateOutOfBounds(tilesToCheck[i], 10, 10)) {
+    if (coordinateOutOfBounds(tilesToCheck[i], 11, 11)) {
       tilesToCheck.splice(i, 1);
       i--;
     }

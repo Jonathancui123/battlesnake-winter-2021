@@ -101,26 +101,28 @@ const findAdjacentDirection = (source, destination) => {
 };
 
 const distance = (source, dest) => {
-  distance = Math.pow(source.x - dest.x, 2) + Math.pow(source.y - dest.y, 2);
+  distance2 = Math.pow(source.x - dest.x, 2) + Math.pow(source.y - dest.y, 2);
+  return distance2;
 }
 
 const distanceToClosestCorner = (source, board) => {
-	width = board.width;
+	width = board.width - 1;
+  height = board.height - 1;
 	shortestDistance = 100000;
 	currDistance = 0;
 	closestCorner = {x: 0, y: 0};
 
 	// check topRight
-	currDistance = Math.pow(source.x - width, 2) + Math.pow(source.y - width, 2);
+	currDistance = Math.pow(source.x - width, 2) + Math.pow(source.y - height, 2);
 	if (currDistance < shortestDistance) {
-		closestCorner = {x: width, y: width};
+		closestCorner = {x: width, y: height};
 		shortestDistance = currDistance;
 	}
 
 	// check topLeft
-	currDistance = Math.pow(source.x, 2) + Math.pow(source.y - width, 2);
+	currDistance = Math.pow(source.x, 2) + Math.pow(source.y - height, 2);
 	if (currDistance < shortestDistance) {
-		closestCorner = {x: 0, y: width};
+		closestCorner = {x: 0, y: height};
 		shortestDistance = currDistance;
 	}
 

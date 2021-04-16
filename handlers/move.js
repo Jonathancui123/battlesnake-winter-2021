@@ -44,7 +44,7 @@ function handleMove(request, response) {
   let move = null;
   console.log();
   console.log(`TURN: ${turnNumber}`);
-  if (numSnakes === 1) {
+  if (numSnakes === 2) {
     // Use minimax snake
     if (USE_LOGGER) {
       // instantiate minimax logger

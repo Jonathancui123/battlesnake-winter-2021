@@ -25,6 +25,7 @@ const {
   HEURISTIC_MIN_FLOODFILL_SCORE,
   HEURISTIC_MAX_FLOODFILL_SCORE,
   HEURISTIC_LARGEST_CONCIEVABLE_SNAKE,
+  HEURISTIC
 } = require("../constants");
 
 // TODO: Fix "off by one error"
@@ -419,7 +420,7 @@ const evaluateBoard = (
   let possibleMove1, possibleMove2;
   
   // edge cases: head is going into a corner or edge
-  // if (mySnake.length >= otherSnake.length + 2) {
+   if (mySnake.length >= otherSnake.length + 2) {
 
     // find other snake's next move
     const otherSnakeNeck = otherSnake.body[1];
@@ -484,8 +485,8 @@ const evaluateBoard = (
     distanceToOtherSnake = distance(mySnakeHead,otherSnakeNextMove);
 
     if (otherSnakeNextMove.x >= 0 && otherSnakeNextMove.x <= board.width - 1 && otherSnakeNextMove.y >= 0 && otherSnakeNextMove.y <= board.height - 1) {
-      aggressionScore = Math.abs((MAX_DISTANCE - distanceToOtherSnake)) * 10;
-    // }
+      aggressionScore = Math.abs((MAX_DISTANCE - distanceToOtherSnake)) * HEURISTIC.aggressionVal;
+    }
   }
   score += aggressionScore;
 
@@ -513,8 +514,8 @@ const evaluateBoard = (
 
   if (otherSnake.health <= 40 ||
     (otherSnake.length < mySnake.length + 2)) {
-    if (bottomNode.foodsWeAteAlongPath) {
-      theirFoodScore -= bottomNode.foodsTheyAteAlongPath * 50;
+    if (bottomNode.foodsTheyAteAlongPath) {
+      theirFoodScore -= bottomNode.foodsTheyAteAlongPath * HEURISTIC.theirFoodVal;
     } else {
       const closestAppleDistance =
         Math.abs(otherSnakeHead.x - closestApple.x) +
@@ -536,7 +537,7 @@ const evaluateBoard = (
     
   if (mySnake.health <= 40 || (mySnakeLength < otherSnake.length + 2)) {
     if (bottomNode.foodsWeAteAlongPath) {
-      foodScore = 100 * bottomNode.foodsWeAteAlongPath;
+      foodScore = HEURISTIC.foodVal * bottomNode.foodsWeAteAlongPath;
     } else {
       const closestAppleDistance =
         Math.abs(mySnakeHead.x - closestApple.x) +

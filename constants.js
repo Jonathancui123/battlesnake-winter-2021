@@ -1,6 +1,6 @@
 module.exports = {
   // Logger
-  USE_LOGGER: true,
+  USE_LOGGER: false,
   LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE: 100,
   COLOURS: {
     red: "#be4b15",

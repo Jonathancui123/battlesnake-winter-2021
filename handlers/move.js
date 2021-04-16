@@ -68,7 +68,8 @@ function handleMove(request, response) {
     // Use "logic" snake
     const closestApple = findClosestApple(allFood, snakeHead);
     let closestAppleMove = undefined;
-    if (closestApple){ // && mySnake.length <= 10) {
+    if (closestApple) {
+      // && mySnake.length <= 10) {
       const start = graph.grid[snakeHead.x][snakeHead.y];
       const end = graph.grid[closestApple.x][closestApple.y];
       const result = astar.search(graph, start, end);
@@ -96,18 +97,27 @@ function handleMove(request, response) {
     const safeMovesFromHeadOnAndFloodfill = [];
 
     // Stop after floodfill counts this many tiles open tiles (runtime optimization)
-    
+
     const maxFloodfillCount = mySnake.length * 2;
     var i;
     for (i = 0; i < safeMovesFromHeadOnDeath.length; i++) {
-      const visited = {}
-      spotToFloodFill = getAdjacentCoordinate(mySnake.head, safeMovesFromHeadOnDeath[i])
-      numSpaces = floodfillHelper(grid, spotToFloodFill.x, spotToFloodFill.y, maxFloodfillCount, visited);
+      const visited = {};
+      spotToFloodFill = getAdjacentCoordinate(
+        mySnake.head,
+        safeMovesFromHeadOnDeath[i]
+      );
+      numSpaces = floodfillHelper(
+        grid,
+        spotToFloodFill.x,
+        spotToFloodFill.y,
+        maxFloodfillCount,
+        visited
+      );
       if (numSpaces > mySnake.length * 1.5) {
         safeMovesFromHeadOnAndFloodfill.push(safeMovesFromHeadOnDeath[i]);
       }
     }
-    
+
     console.log(`ClosestAppleMove: ${closestAppleMove}`);
     console.log(`PossibleMoves: ${possibleMoves}`);
     console.log(`HeadOnSafe: ${safeMovesFromHeadOnDeath}`);

@@ -15,21 +15,38 @@ module.exports = {
   },
   // How many moves to simulate
   // Two moves (one from each snake) is one "turn" in the game. e.g. MINIMAX_DEPTH=2 means that we will only simulate the immediate turn
+<<<<<<< HEAD
   MINIMAX_DEPTH : 8,
+=======
+  MINIMAX_DEPTH : 4,
+>>>>>>> fix/grid-bugs
   MAX_HEALTH: 100,
   // Heuristics:
-  HEURISTIC_FUTURE_UNCERTAINTY_FACTOR: 0.87,
-
-  HEURISTIC_SAFE_CAVERN_SIZE: 2, // How many times bigger the cavern must be than our snake to be considered “safe”
-  // HEURISTIC_MIN_FLOODFILL_SCORE and HEURISTIC_MAX_FLOODFILL_SCORE should both be POSITIVE NUMBERS!
-  HEURISTIC_MIN_FLOODFILL_SCORE: 25, // The score we wish to assign to a cavern that is "barely unsafe" for the "largest conceivable snake"
-  HEURISTIC_MAX_FLOODFILL_SCORE: 100, // The score we wish to assign to a cavern that is of size 0 (maximally unsafe)
-  HEURISTIC_LARGEST_CONCIEVABLE_SNAKE: 30, // How big can our snake possibly get? Affects how fast we go from MAX_FLOODFILL_SCORE to MIN_FLOODFILL_SCORE
   HEURISTIC: {
+<<<<<<< HEAD
     foodVal: 50,
     theirFoodVal: 25,
     aggressionVal: 7.5,
     edgeValInner: 30,
     edgeValOuter: 15
   },
+=======
+    foodVal: 100,
+    theirFoodVal: 50,
+    aggressionVal: 10,
+
+    // floodfill:
+    // HEURISTIC_MIN_FLOODFILL_SCORE and HEURISTIC_MAX_FLOODFILL_SCORE should both be POSITIVE NUMBERS!
+    maxFloodfillScore: 100,// The score we wish to assign to a cavern that is of size 0 (maximally unsafe)
+    minFloodfillScore: 25,// The score we wish to assign to a cavern that is "barely unsafe" for the "largest conceivable snake"
+    safeCavernSize: 1.8, // How many times bigger the cavern must be than our snake to be considered “safe”
+    largestConcievableSnake: 30,// How big can our snake possibly get? Affects how fast we go from MAX_FLOODFILL_SCORE to MIN_FLOODFILL_SCORE
+    ourFloodfillScoreMultiplier: 1,
+    theirFloodfillScoreMultiplier: 0.5,
+
+
+    // future-death:
+    futureUncertaintyFactor: 0.87,
+  }
+>>>>>>> fix/grid-bugs
 }

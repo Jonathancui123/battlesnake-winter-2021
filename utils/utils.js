@@ -57,14 +57,17 @@ const adjacentTiles = ({ x, y }, height, width) => {
 };
 
 const safeAdjacentTiles = (tiles, mySnake, otherSnake) => {
-  safeTiles = []
+  safeTiles = [];
   tiles.forEach((tile) => {
-    if (otherSnake.body.indexOf(tile) == -1 && mySnake.body.indexOf(tile) == -1) {
+    if (
+      otherSnake.body.indexOf(tile) == -1 &&
+      mySnake.body.indexOf(tile) == -1
+    ) {
       safeTiles.push(tile);
     }
   });
   return safeTiles;
-}
+};
 
 // console.log(adjacentTiles({ x: 0, y: 0 }, 11, 11));
 // console.log(adjacentTiles({ x: 10, y: 10 }, 11, 11));
@@ -112,80 +115,80 @@ const findAdjacentDirection = (source, destination) => {
 
 const distance = (source, dest) => {
   return Math.abs(source.x - dest.x) + Math.abs(source.y - dest.y);
-}
+};
 
 const distanceToClosestCorner = (source, board) => {
-	width = board.width - 1;
+  width = board.width - 1;
   height = board.height - 1;
-	shortestDistance = 100000;
-	currDistance = 0;
-	closestCorner = {x: 0, y: 0};
+  shortestDistance = 100000;
+  currDistance = 0;
+  closestCorner = { x: 0, y: 0 };
 
-	// check topRight
-	currDistance = Math.pow(source.x - width, 2) + Math.pow(source.y - height, 2);
-	if (currDistance < shortestDistance) {
-		closestCorner = {x: width, y: height};
-		shortestDistance = currDistance;
-	}
+  // check topRight
+  currDistance = Math.pow(source.x - width, 2) + Math.pow(source.y - height, 2);
+  if (currDistance < shortestDistance) {
+    closestCorner = { x: width, y: height };
+    shortestDistance = currDistance;
+  }
 
-	// check topLeft
-	currDistance = Math.pow(source.x, 2) + Math.pow(source.y - height, 2);
-	if (currDistance < shortestDistance) {
-		closestCorner = {x: 0, y: height};
-		shortestDistance = currDistance;
-	}
+  // check topLeft
+  currDistance = Math.pow(source.x, 2) + Math.pow(source.y - height, 2);
+  if (currDistance < shortestDistance) {
+    closestCorner = { x: 0, y: height };
+    shortestDistance = currDistance;
+  }
 
-	// check bottomLeft
-	currDistance = Math.pow(source.x, 2) + Math.pow(source.y, 2);
-	if (currDistance < shortestDistance) {
-		closestCorner = {x: 0, y: 0};
-		shortestDistance = currDistance;
-	}
+  // check bottomLeft
+  currDistance = Math.pow(source.x, 2) + Math.pow(source.y, 2);
+  if (currDistance < shortestDistance) {
+    closestCorner = { x: 0, y: 0 };
+    shortestDistance = currDistance;
+  }
 
-	// check bottomRight
-	currDistance = Math.pow(source.x - width, 2) + Math.pow(source.y, 2);
-	if (currDistance < shortestDistance) {
-		closestCorner = {x: width, y: 0};
-		shortestDistance = currDistance;
-	}
+  // check bottomRight
+  currDistance = Math.pow(source.x - width, 2) + Math.pow(source.y, 2);
+  if (currDistance < shortestDistance) {
+    closestCorner = { x: width, y: 0 };
+    shortestDistance = currDistance;
+  }
 
-	return shortestDistance;
-}
+  return shortestDistance;
+};
 
 // Returns the adjacent coordinates object {x: ##, y:##} that is in a certain direction from the source
 const getAdjacentCoordinate = (source, directionString) => {
   try {
     if (directionString === "up") {
-      return up(source)
-    } else if (directionString === "left"){
-      return left(source)
-    } else if (directionString === "right"){
-      return right(source)
-    } else if (directionString === "down"){
-      return down(source)
+      return up(source);
+    } else if (directionString === "left") {
+      return left(source);
+    } else if (directionString === "right") {
+      return right(source);
+    } else if (directionString === "down") {
+      return down(source);
     } else {
       // String was invalid
-      throw Error("invalid direction string")
+      throw Error("invalid direction string");
     }
-  } catch(e) {
+  } catch (e) {
     console.error(e);
-    return source
+    return source;
   }
-}
+};
 
 // Given a coordinate, the board height, and board width, checks if out of bounds
-const coordinateOutOfBounds = ({x, y}, height, width) => {
+const coordinateOutOfBounds = ({ x, y }, height, width) => {
   if (x < 0 || y < 0 || x >= width || y >= height) {
-    return true
+    return true;
   } else {
-    return false
+    return false;
   }
-}
+};
 
 // Returns true if coordinates are equal, false otherwise
 const coordinatesAreEqual = (coordinate1, coordinate2) => {
   return coordinate1.x == coordinate2.x && coordinate1.y == coordinate2.y;
-}
+};
 
 const findClosestApple = (allFood, { x, y }) => {
   shortestDistance = 100000;
@@ -208,50 +211,52 @@ const findClosestApple = (allFood, { x, y }) => {
 };
 
 const prettyPrintGrid = (grid) => {
-  console.log()
-  grid.forEach((row) => {
-    console.log(row.join(' '));
-  }) 
-}
-
-const transposeArray = (array, arrayLength) =>{
-    var newArray = [];
-    for(var i = 0; i < array.length; i++){
-        newArray.push([]);
-    };
-
-    for(var i = 0; i < array.length; i++){
-        for(var j = 0; j < arrayLength; j++){
-            newArray[j].push(array[i][j]);
-        };
-    };
-
-    return newArray;
-}
-
-const gridToString = (grid) => {
-
-  var transposedGrid = [...Array(11)].map((e) =>
-    Array(11).fill(8)
-  );
+  var transposedGrid = [...Array(11)].map((e) => Array(11).fill(8));
   var i;
-  for (i=10; i >= 0; i--){
+  for (i = 10; i >= 0; i--) {
     var j;
-    for (j =0; j < 11; j++){
-      transposedGrid[10-i][j] = grid[j][i]
+    for (j = 0; j < 11; j++) {
+      transposedGrid[10 - i][j] = grid[j][i];
     }
   }
-  
-  var stringGrid = [...Array(11)]
-  var k;
-  for (k = 0; k < 11; k++){
-    stringGrid[k] = transposedGrid[k].join('')
+
+  console.log();
+  transposedGrid.forEach((row) => {
+    console.log(row.join(" "));
+  });
+};
+
+// Rotates our virtual grid by 90 degrees to match the actual game orientation
+// Outputs a string of that grid in 1's and 0's
+const gridToString = (grid) => {
+  var transposedGrid = [...Array(11)].map((e) => Array(11).fill(8));
+  var i;
+  for (i = 10; i >= 0; i--) {
+    var j;
+    for (j = 0; j < 11; j++) {
+      transposedGrid[10 - i][j] = grid[j][i];
+    }
   }
 
-  const finalString = "\n" + stringGrid.join('\n')
+  var stringGrid = [...Array(11)];
+  var k;
+  for (k = 0; k < 11; k++) {
+    stringGrid[k] = transposedGrid[k].join("");
+  }
+
+  const finalString = "\n" + stringGrid.join("\n");
 
   return finalString;
-}
+};
+
+const isAnySnakeHeadAtCoordinate = (snakes, coordinate) => {
+  for (const snake of snakes) {
+    if (coordinatesAreEqual(snake.head, coordinate)) {
+      return true;
+    }
+  }
+  return false;
+};
 
 module.exports = {
   up,
@@ -264,11 +269,12 @@ module.exports = {
   findAdjacentDirection,
   getAdjacentCoordinate,
   coordinateOutOfBounds,
-	coordinatesAreEqual,
-	findClosestApple,
-	distanceToClosestCorner,
+  coordinatesAreEqual,
+  findClosestApple,
+  distanceToClosestCorner,
   prettyPrintGrid,
   gridToString,
   distance,
-  safeAdjacentTiles
+  safeAdjacentTiles,
+  isAnySnakeHeadAtCoordinate,
 };

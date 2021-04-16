@@ -190,6 +190,15 @@ const coordinatesAreEqual = (coordinate1, coordinate2) => {
   return coordinate1.x == coordinate2.x && coordinate1.y == coordinate2.y;
 };
 
+const isCoordinateInArrayOfCoordinates = (coordinate, coordinateArray) => {
+  for (const coordinateToCheck of coordinateArray) {
+    if (coordinatesAreEqual(coordinate, coordinateToCheck)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 const findClosestApple = (allFood, { x, y }) => {
   shortestDistance = 100000;
   closestApple = { x, y };
@@ -277,4 +286,5 @@ module.exports = {
   distance,
   safeAdjacentTiles,
   isAnySnakeHeadAtCoordinate,
+  isCoordinateInArrayOfCoordinates,
 };

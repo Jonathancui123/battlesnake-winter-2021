@@ -10,6 +10,7 @@ const {
   findAdjacentDirection,
   coordinatesAreEqual,
   findClosestApple,
+  isCoordinateInArrayOfCoordinates
 } = require("../utils/utils");
 
 const { floodfillHelper } = require("../utils/floodfill");
@@ -83,7 +84,7 @@ function handleMove(request, response) {
       }
     }
 
-    var possibleMoves = possibleImmediateMoves(mySnake.head, board);
+    var possibleMoves = possibleImmediateMoves(mySnake.head, board, mySnake);
 
     const safeMovesFromHeadOnDeath = movesWithoutHeadOnDeath(
       mySnake,
@@ -173,7 +174,7 @@ function handleMove(request, response) {
   }
 }
 
-const possibleImmediateMoves = (mySnakeHead, board) => {
+const possibleImmediateMoves = (mySnakeHead, board, mySnake) => {
   // Mark each direction as illegal when an obstacle is seen
   const legals = {
     up: true,
@@ -214,12 +215,40 @@ const possibleImmediateMoves = (mySnakeHead, board) => {
     });
   });
 
+  // Check if our own tail is adjacent to our head
+  let safeDirectionToOurTail = undefined;
+  const tilesAdjacentToHead = adjacentTiles(mySnakeHead, board.height, board.width); 
+  const myTailCoordinate = mySnake.body[mySnake.body.length - 1];
+  for (const adjacentTile of tilesAdjacentToHead){
+    if (coordinatesAreEqual(adjacentTile, myTailCoordinate)){
+      safeDirectionToOurTail = findAdjacentDirection(mySnakeHead, myTailCoordinate)
+    }
+  }
+  // Check if any snake's tails are adjacent to our head 
+  // (this list will include our own)
+  let safeDirectionsToAnyTails = [];
+  for (const someSnake of snakes){
+    const snakeTailCoordinate = someSnake.body[someSnake.body.length - 1];
+    if (isCoordinateInArrayOfCoordinates(snakeTailCoordinate, tilesAdjacentToHead)){
+      safeDirectionsToAnyTails.push(findAdjacentDirection(mySnakeHead, snakeTailCoordinate));
+    }
+  }
+
   const legalMoves = [];
   directions.forEach((direction) => {
     if (legals[direction]) {
       legalMoves.push(direction);
     }
   });
+
+  if (safeDirectionToOurTail !== undefined) {
+    // Mark our own tail as a safe position
+    legalMoves.push(safeDirectionToOurTail)
+  } else if (legalMoves.length === 0 && safeDirectionsToAnyTails.length > 0){
+    // There are no legal moves. Start considering other snake's tails
+    legalMoves = safeDirectionsToAnyTails;
+  }
+
   return legalMoves;
 };
 

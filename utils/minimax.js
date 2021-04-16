@@ -440,7 +440,7 @@ const evaluateBoard = (
   const bottomNode = game.changeHistory[game.changeHistory.length - 1];
 
   // ********** HEURISTIC: AGGRESSION LOGIC *************
-  /*
+  
   let aggressionScore = 0;
   let distanceToOtherSnake = 0;
   let otherSnakeNextMove = { x: otherSnakeHead.x, y: otherSnakeHead.y };
@@ -523,7 +523,6 @@ const evaluateBoard = (
     aggressionScore = Math.abs((MAX_DISTANCE - distanceToOtherSnake)) * HEURISTIC.aggressionVal;
   }
   score += aggressionScore;
-  */
 
   // ********** HEURISTIC: KILL/DEATH *************
   // gameOverValue is -500 if mySnake might die
@@ -541,7 +540,7 @@ const evaluateBoard = (
   }
 
   // ********** HEURISTIC: FOOD (Health, size) *************
-  /*
+
   let foodScore = 0;
   let theirFoodScore = 0;
   const closestApple = findClosestApple(board.food, mySnakeHead);
@@ -594,7 +593,6 @@ const evaluateBoard = (
   // console.log(foodScore)
   score += foodScore;
   score += theirFoodScore;
-  */
 
   // // ********** HEURISTIC: FLOODFILL *************
   let cavernSize = 0;

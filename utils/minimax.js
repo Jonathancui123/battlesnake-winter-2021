@@ -593,7 +593,6 @@ const evaluateBoard = (
   // console.log(foodScore)
   score += foodScore;
   score += theirFoodScore;
-
   // // ********** HEURISTIC: FLOODFILL *************
   let cavernSize = 0;
   let floodFillScore = 0;

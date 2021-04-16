@@ -197,28 +197,27 @@ const findClosestApple = (allFood, { x, y }) => {
   return closestApple;
 };
 
+
 const prettyPrintGrid = (grid) => {
+  var transposedGrid = [...Array(11)].map((e) =>
+    Array(11).fill(8)
+  );
+  var i;
+  for (i=10; i >= 0; i--){
+    var j;
+    for (j =0; j < 11; j++){
+      transposedGrid[10-i][j] = grid[j][i]
+    }
+  }
+  
   console.log()
-  grid.forEach((row) => {
+  transposedGrid.forEach((row) => {
     console.log(row.join(' '));
   }) 
 }
 
-const transposeArray = (array, arrayLength) =>{
-    var newArray = [];
-    for(var i = 0; i < array.length; i++){
-        newArray.push([]);
-    };
-
-    for(var i = 0; i < array.length; i++){
-        for(var j = 0; j < arrayLength; j++){
-            newArray[j].push(array[i][j]);
-        };
-    };
-
-    return newArray;
-}
-
+// Rotates our virtual grid by 90 degrees to match the actual game orientation
+// Outputs a string of that grid in 1's and 0's
 const gridToString = (grid) => {
 
   var transposedGrid = [...Array(11)].map((e) =>
@@ -243,6 +242,15 @@ const gridToString = (grid) => {
   return finalString;
 }
 
+const isAnySnakeHeadAtCoordinate = (snakes, coordinate) => {
+  for (const snake of snakes) {
+    if (coordinatesAreEqual(snake.head, coordinate)){
+      return true;
+    }
+  }
+  return false;
+}
+
 module.exports = {
   up,
   down,
@@ -259,5 +267,6 @@ module.exports = {
 	distanceToClosestCorner,
   prettyPrintGrid,
   gridToString,
-  distance
+  distance,
+  isAnySnakeHeadAtCoordinate
 };

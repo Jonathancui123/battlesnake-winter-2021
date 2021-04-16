@@ -8,10 +8,9 @@ const {
   distanceToClosestCorner,
   prettyPrintGrid,
   gridToString,
-  distance
+  distance,
+  isAnySnakeHeadAtCoordinate
 } = require("./utils");
-
-var numberOfTimesEvalHasBeenCalled = 0;
 
 const { largestAdjacentFloodfill } = require("./floodfill");
 
@@ -20,19 +19,17 @@ const { astar, Graph } = require("./pathfinding");
 const {
   MINIMAX_DEPTH,
   MAX_HEALTH,
-  HEURISTIC_FUTURE_UNCERTAINTY_FACTOR,
-  HEURISTIC_SAFE_CAVERN_SIZE,
-  HEURISTIC_MIN_FLOODFILL_SCORE,
-  HEURISTIC_MAX_FLOODFILL_SCORE,
-  HEURISTIC_LARGEST_CONCIEVABLE_SNAKE,
   HEURISTIC
 } = require("../constants");
+
+const {
+  calcFloodfillScore
+} = require("./heuristics");
 
 // TODO: Fix "off by one error"
 // Game object which represents the board: (explanation: https://www.w3schools.com/js/js_object_constructors.asp)
 // Supports methods for modifying the board, undoing modifications, and getting potential moves
 function MinimaxGame(board) {
-  numberOfTimesEvalHasBeenCalled = 0;
   // The state of the board at the current node of Minimax simulation
   // Battlesnake API board object
   this.board = board;
@@ -113,12 +110,15 @@ function MinimaxGame(board) {
       // TODO: food: describe food changes
     };
 
-    if (
-     !coordinateOutOfBounds(newSnakeHeadCoordinate, this.board.height, this.board.width)
-    ) {
-      this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y] = 0;
+    // Set the snakeTailCoordinate to 1 if it should be blank the next turn. Don't change it from 0 if the newSnakeHeadCoordinate is at the snakeTailCoordinate or anySnakeHeadAtCoordinate of the snakeTailCoordinate
+    if (!coordinatesAreEqual(newSnakeHeadCoordinate, snakeTailCoordinate) && !isAnySnakeHeadAtCoordinate(this.board.snakes, snakeTailCoordinate)){
+      this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
     }
-    this.grid[snakeTailCoordinate.x][snakeTailCoordinate.y] = 1;
+    if (
+      !coordinateOutOfBounds(newSnakeHeadCoordinate, this.board.height, this.board.width)
+    ) {
+       this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y] = 0;
+    }
 
     this.changeHistory.push(newChange);
     // 'currentSnake' object is referencing an object in "this.board"
@@ -363,10 +363,16 @@ const evaluateIfGameOver = (board, mySnakeID, otherSnakeID, remainingDepth, logg
     if (otherSnakeHeadCollisions > 1) {
       otherSnakeDead = true;
     }
+  } else {
+    if (mySnakeHeadCollisions > 2 && otherSnakeHeadCollisions > 2) {
+      // We both die by crashing into the same body part
+      mySnakeDead = true;
+      otherSnakeDead = true;
+    } 
   }
 
   const adjustForFutureUncertainty = (score) => {
-    return score* (HEURISTIC_FUTURE_UNCERTAINTY_FACTOR**(MINIMAX_DEPTH - remainingDepth - 2))
+    return score* (HEURISTIC.futureUncertaintyFactor**(MINIMAX_DEPTH - remainingDepth - 2))
   };
   let score;
 
@@ -402,18 +408,17 @@ const evaluateBoard = (
   // score will only be negative if it might die
 
   var score = 0;
-  // console.log(numberOfTimesEvalHasBeenCalled);
-  // prettyPrintGrid(grid);  
-  // numberOfTimesEvalHasBeenCalled++;
   const mySnake = board.snakes.find((snake) => snake.id === mySnakeID);
   const otherSnake = board.snakes.find((snake) => snake.id === otherSnakeID);
   const mySnakeHead = mySnake.head;
   const mySnakeLength = mySnake.length;
+  const otherSnakeLength = otherSnake.length;
   const otherSnakeHead = otherSnake.head;
   const MAX_DISTANCE = board.width + board.height;
   const bottomNode = game.changeHistory[game.changeHistory.length - 1];
 
   // ********** HEURISTIC: AGGRESSION LOGIC *************
+  /*
   let aggressionScore = 0;
   let distanceToOtherSnake = 0;
   let otherSnakeNextMove = { x: 0, y: 0 };
@@ -489,6 +494,7 @@ const evaluateBoard = (
     }
   }
   score += aggressionScore;
+  */
 
   // ********** HEURISTIC: KILL/DEATH *************
   // gameOverValue is -500 if mySnake might die
@@ -507,7 +513,7 @@ const evaluateBoard = (
 
   
   // ********** HEURISTIC: FOOD (Health, size) *************
-  
+  /*
   let foodScore = 0;
   let theirFoodScore = 0;
   const closestApple = findClosestApple(board.food, mySnakeHead);
@@ -559,38 +565,20 @@ const evaluateBoard = (
   // console.log(foodScore)
   score += foodScore;
   score += theirFoodScore;
+  */
 
   // // ********** HEURISTIC: FLOODFILL *************
   let cavernSize = 0;
   let floodFillScore = 0;
 
-  if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
-    cavernSize = largestAdjacentFloodfill(
-      grid,
-      mySnakeHead,
-      HEURISTIC_SAFE_CAVERN_SIZE* mySnakeLength
-    );
-    // console.log(
-    //   "cavernSize for " +
-    //     mySnakeHead.x +
-    //     ", " +
-    //     mySnakeHead.y +
-    //     ":" +
-    //     cavernSize
-    // );
-  }
+  let ourFloodfillScore = calcFloodfillScore(grid, mySnakeHead, mySnakeLength, board.height, board.width)
+  ourFloodfillScore *= HEURISTIC.ourFloodfillScoreMultiplier;
 
-  // Logic on google docs
-  if (cavernSize >= HEURISTIC_SAFE_CAVERN_SIZE * mySnakeLength) {
-    // Safe..
-    // Due to the floodfill stopping point, the largest cavernSize should be HEURISTIC_SAFE_CAVERN_SIZE * mySnakeLength
-    floodFillScore = 0;
-  } else {
-    // calculate floodfillscore, based on google doc
-    floodFillScore = (((HEURISTIC_MAX_FLOODFILL_SCORE - HEURISTIC_MIN_FLOODFILL_SCORE) / Math.sqrt(HEURISTIC_SAFE_CAVERN_SIZE* HEURISTIC_LARGEST_CONCIEVABLE_SNAKE))* Math.sqrt(cavernSize)) - HEURISTIC_MAX_FLOODFILL_SCORE
-  }
-  // floodfill score is a NEGATIVE NUMBER between negative HEURISTIC_MAX_FLOODFILL_SCORE and zero
-  score += floodFillScore;
+  // Positive number for when their snake has little space left
+  let theirFloodfillScore = (-1) * calcFloodfillScore(grid, otherSnakeHead, otherSnakeLength, board.height, board.width);
+  theirFloodfillScore *= HEURISTIC.theirFloodfillScoreMultiplier
+
+  floodFillScore = ourFloodfillScore + theirFloodfillScore;
   
   // ********** HEURISTIC: EDGES *************
   /*
@@ -631,15 +619,15 @@ const evaluateBoard = (
   */
   if (logger) {
     const heuristicInfo = {  
-      Food: foodScore,
-      OurFoodEaten: bottomNode.foodsWeAteAlongPath,
-      TheirFoodEaten: bottomNode.foodsTheyAteAlongPath,
+      // Food: foodScore,
+      // OurFoodEaten: bottomNode.foodsWeAteAlongPath,
+      // TheirFoodEaten: bottomNode.foodsTheyAteAlongPath,
       Floodfill: floodFillScore,
-      Cavern: cavernSize,
-      AggressionDistance: distanceToOtherSnake,
-      Aggression: aggressionScore,
-      NextMove: otherSnakeNextMove,
-      EvalNumber: numberOfTimesEvalHasBeenCalled,
+      ourFloodfillScore,
+      theirFloodfillScore,
+      // AggressionDistance: distanceToOtherSnake,
+      // Aggression: aggressionScore,
+      // NextMove: otherSnakeNextMove,
       // Edges: edgesScore,
       // Corners: cornerScore,
     };

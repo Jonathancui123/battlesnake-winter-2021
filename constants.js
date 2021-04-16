@@ -1,6 +1,6 @@
 module.exports = {
   // Logger
-  USE_LOGGER : true,
+  USE_LOGGER : false,
   LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE: 30,
   COLOURS : {
     red: "#be4b15",
@@ -15,7 +15,7 @@ module.exports = {
   },
   // How many moves to simulate
   // Two moves (one from each snake) is one "turn" in the game. e.g. MINIMAX_DEPTH=2 means that we will only simulate the immediate turn
-  MINIMAX_DEPTH : 6,
+  MINIMAX_DEPTH : 8,
   MAX_HEALTH: 100,
   // Heuristics:
   HEURISTIC_FUTURE_UNCERTAINTY_FACTOR: 0.87,
@@ -26,8 +26,10 @@ module.exports = {
   HEURISTIC_MAX_FLOODFILL_SCORE: 100, // The score we wish to assign to a cavern that is of size 0 (maximally unsafe)
   HEURISTIC_LARGEST_CONCIEVABLE_SNAKE: 30, // How big can our snake possibly get? Affects how fast we go from MAX_FLOODFILL_SCORE to MIN_FLOODFILL_SCORE
   HEURISTIC: {
-    foodVal: 100,
-    theirFoodVal: 50,
-    aggressionVal: 10,
-  }
+    foodVal: 50,
+    theirFoodVal: 25,
+    aggressionVal: 7.5,
+    edgeValInner: 30,
+    edgeValOuter: 15
+  },
 }

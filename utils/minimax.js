@@ -573,7 +573,7 @@ const evaluateBoard = (
   // // ********** HEURISTIC: FLOODFILL *************
   let cavernSize = 0;
   let floodFillScore = 0;
-
+  
   if (!coordinateOutOfBounds(mySnakeHead, board.height, board.width)) {
     cavernSize = largestAdjacentFloodfill(
       grid,
@@ -603,11 +603,11 @@ const evaluateBoard = (
   score += floodFillScore;
   
   // ********** HEURISTIC: EDGES *************
-  /*
+  
   let edgesScore = 0;
 
-  let outerBound = 200;
-  let secondOuterBound = 100;
+  let outerBound = HEURISTIC.edgeValInner;
+  let secondOuterBound = HEURISTIC.edgeValOuter;
 
   // the closer our snake is to the edge, the worse it is
   if (mySnakeHead.x == 0 || mySnakeHead.x == board.width - 1 ||
@@ -632,13 +632,13 @@ const evaluateBoard = (
   }
 
   score += edgesScore;
-
+  
   // // ********** HEURISTIC: CORNERS *************
   // let cornerScore;
   // cornerScore = MAX_DISTANCE - distanceToClosestCorner(otherSnakeHead, board);
   // cornerScore -= (MAX_DISTANCE - distanceToClosestCorner(mySnakeHead, board)) / 2;
   // score += cornerScore
-  */
+  
   if (logger) {
     const heuristicInfo = {  
       Food: foodScore,

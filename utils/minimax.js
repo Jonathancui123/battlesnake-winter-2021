@@ -619,6 +619,7 @@ const evaluateBoard = (
   theirFloodfillScore *= HEURISTIC.theirFloodfillScoreMultiplier;
 
   floodFillScore = ourFloodfillScore + theirFloodfillScore;
+  score += floodFillScore;
 
   // ********** HEURISTIC: EDGES *************
 
@@ -634,7 +635,7 @@ const evaluateBoard = (
     mySnakeHead.y == 0 ||
     mySnakeHead.y == board.height - 1
   ) {
-    edgesScore -= outerBound;
+    edgesScore -= (outerBound / 2);
   }
 
   if (
@@ -643,7 +644,7 @@ const evaluateBoard = (
     mySnakeHead.y == 1 ||
     mySnakeHead.y == board.height - 2
   ) {
-    edgesScore -= secondOuterBound;
+    edgesScore -= (secondOuterBound / 2);
   }
 
   // the closer enemy snake is to the edge, the better
@@ -653,7 +654,7 @@ const evaluateBoard = (
     otherSnakeHead.y == 0 ||
     otherSnakeHead.y == board.height - 1
   ) {
-    edgesScore += outerBound;
+    edgesScore += outerBound / 2;
   }
 
   if (
@@ -662,7 +663,7 @@ const evaluateBoard = (
     otherSnakeHead.y == 1 ||
     otherSnakeHead.y == board.height - 2
   ) {
-    edgesScore += secondOuterBound;
+    edgesScore += secondOuterBound / 2;
   }
 
   score += edgesScore;
@@ -675,17 +676,16 @@ const evaluateBoard = (
 
   if (logger) {
     const heuristicInfo = {
-      // Food: foodScore,
-      // OurFoodEaten: bottomNode.foodsWeAteAlongPath,
-      // TheirFoodEaten: bottomNode.foodsTheyAteAlongPath,
+      Food: foodScore,
+      OurFoodEaten: bottomNode.foodsWeAteAlongPath,
+      TheirFoodEaten: bottomNode.foodsTheyAteAlongPath,
       Floodfill: floodFillScore,
       ourFloodfillScore,
       theirFloodfillScore,
-      // AggressionDistance: distanceToOtherSnake,
-      // Aggression: aggressionScore,
-      // NextMove: otherSnakeNextMove,
-      // Edges: edgesScore,
-      // Corners: cornerScore,
+      AggressionDistance: distanceToOtherSnake,
+      Aggression: aggressionScore,
+      NextMove: otherSnakeNextMove,
+      Edges: edgesScore
     };
     logger.logHeuristicDetails(heuristicInfo);
   }

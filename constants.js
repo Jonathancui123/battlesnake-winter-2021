@@ -1,7 +1,7 @@
 module.exports = {
   // Logger
   USE_LOGGER: false,
-  LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE: 100,
+  LOGGER_TURNS_TO_KEEP_BEFORE_OVERWRITE: 50,
   COLOURS: {
     red: "#be4b15",
     green: "#52ce60",
@@ -19,11 +19,11 @@ module.exports = {
   MAX_HEALTH: 100,
   // Heuristics:
   HEURISTIC: {
-    foodVal: 50,
-    theirFoodVal: 25,
-    aggressionVal: 7.5,
-    edgeValInner: 30,
-    edgeValOuter: 15,
+    foodVal: 50, // [0, 100]
+    theirFoodVal: 25, // [-50, 0]
+    aggressionVal: 7.5, // Max = 150
+    edgeValInner: 25,
+    edgeValOuter: 12.5,
     // floodfill:
     // HEURISTIC_MIN_FLOODFILL_SCORE and HEURISTIC_MAX_FLOODFILL_SCORE should both be POSITIVE NUMBERS!
     maxFloodfillScore: 100, // The score we wish to assign to a cavern that is of size 0 (maximally unsafe)
@@ -34,6 +34,6 @@ module.exports = {
     theirFloodfillScoreMultiplier: 0.5,
 
     // future-death:
-    futureUncertaintyFactor: 0.87,
+    futureUncertaintyFactor: 0.87, //  [-1000, -433.6] for kills/deaths, down to -210 for situations where we both die
   },
 };

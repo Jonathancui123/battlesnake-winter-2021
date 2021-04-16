@@ -8,7 +8,9 @@ const {
   distanceToClosestCorner,
   prettyPrintGrid,
   gridToString,
-  distance
+  distance,
+  safeAdjacentTiles,
+  adjacentTiles
 } = require("./utils");
 
 var numberOfTimesEvalHasBeenCalled = 0;
@@ -416,7 +418,7 @@ const evaluateBoard = (
   // ********** HEURISTIC: AGGRESSION LOGIC *************
   let aggressionScore = 0;
   let distanceToOtherSnake = 0;
-  let otherSnakeNextMove = { x: 0, y: 0 };
+  let otherSnakeNextMove = { x: otherSnakeHead.x, y: otherSnakeHead.y };
   let possibleMove1, possibleMove2;
   
   // edge cases: head is going into a corner or edge
@@ -427,7 +429,7 @@ const evaluateBoard = (
 
     // handle scenario if snake is currently at a corner
     distanceToClosestCorner(otherSnakeHead, board);
-    const origin = { x: 0, y: 0};
+    const origin = { x: 0, y: 0 };
     const bottomRight = { x: board.width - 1, y: 0 };
     const topLeft = { x: 0, y: board.height - 1 };
     const topRight = { x: board.width - 1, y: board.height - 1 };
@@ -482,11 +484,18 @@ const evaluateBoard = (
       }
     }
 
-    distanceToOtherSnake = distance(mySnakeHead,otherSnakeNextMove);
-
-    if (otherSnakeNextMove.x >= 0 && otherSnakeNextMove.x <= board.width - 1 && otherSnakeNextMove.y >= 0 && otherSnakeNextMove.y <= board.height - 1) {
-      aggressionScore = Math.abs((MAX_DISTANCE - distanceToOtherSnake)) * HEURISTIC.aggressionVal;
+    // randomly select a safe tile if predicted move is invalid
+    const tiles = adjacentTiles(otherSnakeHead, board.height, board.width);
+    const safeTiles = safeAdjacentTiles(tiles, mySnake, otherSnake);
+    if (coordinateOutOfBounds(otherSnakeNextMove, board.height, board.width) || safeTiles.indexOf(otherSnakeNextMove) == -1) {
+      if (safeTiles.length >= 1){
+        otherSnakeNextMove = safeTiles[Math.floor(Math.random() * safeTiles.length)];
+      }
+      // else kill/death will override aggression heuristic
     }
+
+    distanceToOtherSnake = distance(mySnakeHead,otherSnakeNextMove);
+    aggressionScore = Math.abs((MAX_DISTANCE - distanceToOtherSnake)) * HEURISTIC.aggressionVal;
   }
   score += aggressionScore;
 
@@ -511,6 +520,7 @@ const evaluateBoard = (
   let foodScore = 0;
   let theirFoodScore = 0;
   const closestApple = findClosestApple(board.food, mySnakeHead);
+  const theirClosestApple = findClosestApple(board.food, otherSnakeHead);
 
   if (otherSnake.health <= 40 ||
     (otherSnake.length < mySnake.length + 2)) {
@@ -518,8 +528,8 @@ const evaluateBoard = (
       theirFoodScore -= bottomNode.foodsTheyAteAlongPath * HEURISTIC.theirFoodVal;
     } else {
       const closestAppleDistance =
-        Math.abs(otherSnakeHead.x - closestApple.x) +
-        Math.abs(otherSnakeHead.y - closestApple.y);
+        Math.abs(otherSnakeHead.x - theirClosestApple.x) +
+        Math.abs(otherSnakeHead.y - theirClosestApple.y);
 
       // if (logger) {
       //   const heuristicInfo = {  
@@ -632,13 +642,15 @@ const evaluateBoard = (
   if (logger) {
     const heuristicInfo = {  
       Food: foodScore,
+      OtherFood: theirFoodScore,
       OurFoodEaten: bottomNode.foodsWeAteAlongPath,
       TheirFoodEaten: bottomNode.foodsTheyAteAlongPath,
       Floodfill: floodFillScore,
       Cavern: cavernSize,
       AggressionDistance: distanceToOtherSnake,
       Aggression: aggressionScore,
-      NextMove: otherSnakeNextMove,
+      NextMoveX: otherSnakeNextMove.x,
+      NextMoveY: otherSnakeNextMove.y,
       EvalNumber: numberOfTimesEvalHasBeenCalled,
       // Edges: edgesScore,
       // Corners: cornerScore,

@@ -56,6 +56,16 @@ const adjacentTiles = ({ x, y }, height, width) => {
   return tileList;
 };
 
+const safeAdjacentTiles = (tiles, mySnake, otherSnake) => {
+  safeTiles = []
+  tiles.forEach((tile) => {
+    if (otherSnake.body.indexOf(tile) == -1 && mySnake.body.indexOf(tile) == -1) {
+      safeTiles.push(tile);
+    }
+  });
+  return safeTiles;
+}
+
 // console.log(adjacentTiles({ x: 0, y: 0 }, 11, 11));
 // console.log(adjacentTiles({ x: 10, y: 10 }, 11, 11));
 // console.log(adjacentTiles({ x: 0, y: 10 }, 11, 11));
@@ -259,5 +269,6 @@ module.exports = {
 	distanceToClosestCorner,
   prettyPrintGrid,
   gridToString,
-  distance
+  distance,
+  safeAdjacentTiles
 };

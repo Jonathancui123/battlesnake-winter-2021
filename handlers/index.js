@@ -6,7 +6,7 @@ function handleIndex(request, response) {
     head: "gamer",
     tail: "weight",
   };
-  console.log("INDEX")
+  console.log("INDEX");
   response.status(200).json(battlesnakeInfo);
 }
 

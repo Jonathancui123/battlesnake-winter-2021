@@ -197,7 +197,7 @@ const isCoordinateInArrayOfCoordinates = (coordinate, coordinateArray) => {
     }
   }
   return false;
-}
+};
 
 const findClosestApple = (allFood, { x, y }) => {
   shortestDistance = 100000;

@@ -1,15 +1,6 @@
-const {
-  HEURISTIC
-} = require("../constants");
-
-const {
-  coordinateOutOfBounds
-} = require("./utils");
-
-const {
-  largestAdjacentFloodfill
-} = require("./floodfill");
-
+const { HEURISTIC } = require("../constants");
+const { coordinateOutOfBounds } = require("./utils");
+const { largestAdjacentFloodfill } = require("./floodfill");
 
 const calcFloodfillScore = (
   grid,
@@ -47,5 +38,5 @@ const calcFloodfillScore = (
 };
 
 module.exports = {
-  calcFloodfillScore
-}
+  calcFloodfillScore,
+};

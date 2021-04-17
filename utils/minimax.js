@@ -534,7 +534,7 @@ const evaluateBoard = (
             : possibleMove2;
       }
 
-      // predict other snake's next move normally
+      // predict other snake's next move normally - ie. move linearly
     } else {
       if (otherSnakeNeck.x == otherSnakeHead.x - 1) {
         otherSnakeNextMove = { x: otherSnakeHead.x + 1, y: otherSnakeHead.y };
@@ -595,9 +595,7 @@ const evaluateBoard = (
       theirFoodScore -=
         bottomNode.foodsTheyAteAlongPath * HEURISTIC.theirFoodVal;
     } else {
-      const closestAppleDistance =
-        Math.abs(otherSnakeHead.x - theirClosestApple.x) +
-        Math.abs(otherSnakeHead.y - theirClosestApple.y);
+      const closestAppleDistance = distance(otherSnakeHead, theirClosestApple);
 
       // if (logger) {
       //   const heuristicInfo = {
@@ -617,9 +615,7 @@ const evaluateBoard = (
     if (bottomNode.foodsWeAteAlongPath) {
       foodScore = HEURISTIC.foodVal * bottomNode.foodsWeAteAlongPath;
     } else {
-      const closestAppleDistance =
-        Math.abs(mySnakeHead.x - closestApple.x) +
-        Math.abs(mySnakeHead.y - closestApple.y);
+      const closestAppleDistance = distance(mySnakeHead, closestApple);
 
       // if (logger) {
       //   const heuristicInfo = {
@@ -637,7 +633,9 @@ const evaluateBoard = (
   // console.log(foodScore)
   score += foodScore;
   score += theirFoodScore;
-  // // ********** HEURISTIC: FLOODFILL *************
+
+  // ********** HEURISTIC: FLOODFILL *************
+
   let floodFillScore = 0;
 
   let ourFloodfillScore = calcFloodfillScore(

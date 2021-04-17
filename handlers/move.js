@@ -10,17 +10,12 @@ const {
   findAdjacentDirection,
   coordinatesAreEqual,
   findClosestApple,
-  isCoordinateInArrayOfCoordinates
+  isCoordinateInArrayOfCoordinates,
 } = require("../utils/utils");
-
 const { floodfillHelper } = require("../utils/floodfill");
-
 const { astar, Graph } = require("../utils/pathfinding");
-
 const { calcBestMove, MinimaxGame } = require("../utils/minimax");
-
 const { MinimaxLogger } = require("../visualizer/minimaxLogger");
-
 const { MINIMAX_DEPTH, USE_LOGGER } = require("../constants");
 
 function handleMove(request, response) {
@@ -217,20 +212,31 @@ const possibleImmediateMoves = (mySnakeHead, board, mySnake) => {
 
   // Check if our own tail is adjacent to our head
   let safeDirectionToOurTail = undefined;
-  const tilesAdjacentToHead = adjacentTiles(mySnakeHead, board.height, board.width); 
+  const tilesAdjacentToHead = adjacentTiles(
+    mySnakeHead,
+    board.height,
+    board.width
+  );
   const myTailCoordinate = mySnake.body[mySnake.body.length - 1];
-  for (const adjacentTile of tilesAdjacentToHead){
-    if (coordinatesAreEqual(adjacentTile, myTailCoordinate)){
-      safeDirectionToOurTail = findAdjacentDirection(mySnakeHead, myTailCoordinate)
+  for (const adjacentTile of tilesAdjacentToHead) {
+    if (coordinatesAreEqual(adjacentTile, myTailCoordinate)) {
+      safeDirectionToOurTail = findAdjacentDirection(
+        mySnakeHead,
+        myTailCoordinate
+      );
     }
   }
-  // Check if any snake's tails are adjacent to our head 
+  // Check if any snake's tails are adjacent to our head
   // (this list will include our own)
   let safeDirectionsToAnyTails = [];
-  for (const someSnake of snakes){
+  for (const someSnake of snakes) {
     const snakeTailCoordinate = someSnake.body[someSnake.body.length - 1];
-    if (isCoordinateInArrayOfCoordinates(snakeTailCoordinate, tilesAdjacentToHead)){
-      safeDirectionsToAnyTails.push(findAdjacentDirection(mySnakeHead, snakeTailCoordinate));
+    if (
+      isCoordinateInArrayOfCoordinates(snakeTailCoordinate, tilesAdjacentToHead)
+    ) {
+      safeDirectionsToAnyTails.push(
+        findAdjacentDirection(mySnakeHead, snakeTailCoordinate)
+      );
     }
   }
 
@@ -243,8 +249,8 @@ const possibleImmediateMoves = (mySnakeHead, board, mySnake) => {
 
   if (safeDirectionToOurTail !== undefined) {
     // Mark our own tail as a safe position
-    legalMoves.push(safeDirectionToOurTail)
-  } else if (legalMoves.length === 0 && safeDirectionsToAnyTails.length > 0){
+    legalMoves.push(safeDirectionToOurTail);
+  } else if (legalMoves.length === 0 && safeDirectionsToAnyTails.length > 0) {
     // There are no legal moves. Start considering other snake's tails
     legalMoves = safeDirectionsToAnyTails;
   }

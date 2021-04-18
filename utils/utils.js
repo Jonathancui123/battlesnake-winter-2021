@@ -58,10 +58,14 @@ const adjacentTiles = ({ x, y }, height, width) => {
 
 const safeAdjacentTiles = (tiles, mySnake, otherSnake) => {
   safeTiles = [];
+  mySnakeTailIndex = mySnake.length - 1;
+  otherSnakeTailIndex = otherSnake.length - 1;
   tiles.forEach((tile) => {
     if (
-      otherSnake.body.indexOf(tile) == -1 &&
-      mySnake.body.indexOf(tile) == -1
+      (otherSnake.body.indexOf(tile) == -1 &&
+        mySnake.body.indexOf(tile) == -1) ||
+      otherSnake.body.indexOf(tile) == otherSnakeTailIndex ||
+      mySnake.body.indexOf(tile) == mySnakeTailIndex
     ) {
       safeTiles.push(tile);
     }

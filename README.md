@@ -2,7 +2,7 @@
 
 # A minimax [Battlesnake](http://play.battlesnake.com) Written in JavaScript for Node.js
 
-- First place in RBC hackathon out of 1000+ total RBC interns
+- First place in RBC hackathon out of 100+ total RBC interns
 - Gold rank in [Battlesnake Spring League](https://play.battlesnake.com/league/spring-league-2021/) 
 
 

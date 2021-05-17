@@ -1,6 +1,6 @@
-### [Presentation Slides](https://docs.google.com/presentation/d/1wd11KKJxZhwbKAUPx_f8kU7zUj5VSkwgdafW6jVn0Yk/edit#slide=id.gd14870a917_0_37) explaining our engineering process
-
 # A minimax [Battlesnake](http://play.battlesnake.com) Written in JavaScript for Node.js
+
+### [Presentation slides](https://docs.google.com/presentation/d/1wd11KKJxZhwbKAUPx_f8kU7zUj5VSkwgdafW6jVn0Yk/edit?usp=sharing) explaining our engineering process
 
 - First place in RBC hackathon out of 100+ total RBC interns
 - Gold rank in [Battlesnake Spring League](https://play.battlesnake.com/league/spring-league-2021/) 
@@ -13,13 +13,11 @@
 * [Express](https://expressjs.com/)
 
 
-
 ## Prerequisites
 
 * [Battlesnake Account](https://play.battlesnake.com)
 * [Repl.it Account](https://repl.it)
 * [GitHub Account](https://github.com) (Optional)
-
 
 
 ## Running Your Battlesnake on [Repl.it](https://repl.it)

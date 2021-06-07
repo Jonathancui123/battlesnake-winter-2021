@@ -1,8 +1,4 @@
 const {
-  up,
-  down,
-  left,
-  right,
   adjacentTiles,
   directions,
   boardToGrid,
@@ -42,7 +38,6 @@ function handleMove(request, response) {
   if (numSnakes === 2) {
     // Use minimax snake
     if (USE_LOGGER) {
-      // instantiate minimax logger
       logger = new MinimaxLogger(gameId, turnNumber);
       logger.init();
     }
@@ -65,16 +60,13 @@ function handleMove(request, response) {
     const closestApple = findClosestApple(allFood, snakeHead);
     let closestAppleMove = undefined;
     if (closestApple) {
-      // && mySnake.length <= 10) {
       const start = graph.grid[snakeHead.x][snakeHead.y];
       const end = graph.grid[closestApple.x][closestApple.y];
       const result = astar.search(graph, start, end);
-      // console.log("astar: ", result);
       console.log("snakehead: ", snakeHead);
       console.log("closest apple: ", closestApple);
 
       if (result.length > 0) {
-        // If an apple exists on the board:
         closestAppleMove = findAdjacentDirection(snakeHead, result[0]);
       }
     }

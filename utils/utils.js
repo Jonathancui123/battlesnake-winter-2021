@@ -73,16 +73,6 @@ const safeAdjacentTiles = (tiles, mySnake, otherSnake) => {
   return safeTiles;
 };
 
-// console.log(adjacentTiles({ x: 0, y: 0 }, 11, 11));
-// console.log(adjacentTiles({ x: 10, y: 10 }, 11, 11));
-// console.log(adjacentTiles({ x: 0, y: 10 }, 11, 11));
-// console.log(adjacentTiles({ x: 10, y: 0 }, 11, 11));
-// console.log(adjacentTiles({ x: 0, y: 5 }, 11, 11));
-// console.log(adjacentTiles({ x: 10, y: 5 }, 11, 11));
-// console.log(adjacentTiles({ x: 5, y: 0 }, 11, 11));
-// console.log(adjacentTiles({ x: 5, y: 10 }, 11, 11));
-// console.log(adjacentTiles({ x: 5, y: 5 }, 11, 11));
-
 const boardToGrid = (board) => {
   var value = 1; // by default
   var myGrid = [...Array(board.height)].map((e) =>
@@ -95,9 +85,6 @@ const boardToGrid = (board) => {
       myGrid[occupiedCoordinate.x][occupiedCoordinate.y] = 0;
     });
   });
-
-  // console.log("**** MY GRID ****");
-  // console.log(myGrid);
   return myGrid;
 };
 

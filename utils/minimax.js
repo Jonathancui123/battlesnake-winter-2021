@@ -6,7 +6,6 @@ const {
   boardToGrid,
   findClosestApple,
   distanceToClosestCorner,
-  prettyPrintGrid,
   gridToString,
   distance,
   safeAdjacentTiles,
@@ -18,12 +17,10 @@ const { astar, Graph } = require("./pathfinding");
 const { MINIMAX_DEPTH, MAX_HEALTH, HEURISTIC } = require("../constants");
 const { calcFloodfillScore } = require("./heuristics");
 
-// TODO: Fix "off by one error"
 // Game object which represents the board: (explanation: https://www.w3schools.com/js/js_object_constructors.asp)
 // Supports methods for modifying the board, undoing modifications, and getting potential moves
 function MinimaxGame(board) {
   // The state of the board at the current node of Minimax simulation
-  // Battlesnake API board object
   this.board = board;
 
   // this.grid is a 2D array where the outer array indices are vertical from one another, and inner array indices are horizontal from one another
@@ -38,9 +35,6 @@ function MinimaxGame(board) {
   // move: the direction (string) in which the snake will move
   // snakeID: the snake which is being moved
   this.move = function (moveDirection, snakeID, mySnakeID) {
-    // TODO: Account for food getting eaten --> remove food from board, grow the snake
-
-    // Find the snake to move
     const currentSnake = this.board.snakes.find(
       (snake) => snake.id === snakeID
     );
@@ -64,19 +58,18 @@ function MinimaxGame(board) {
         this.board.width
       )
     ) {
-      oldGrid.newHeadPosition = this.grid[newSnakeHeadCoordinate.x][
-        newSnakeHeadCoordinate.y
-      ];
+      oldGrid.newHeadPosition =
+        this.grid[newSnakeHeadCoordinate.x][newSnakeHeadCoordinate.y];
     }
 
     var foodsWeAteAlongPath = 0;
     var foodsTheyAteAlongPath = 0;
     // Check if we have eaten food in the previous move. If so, persist info
     if (this.changeHistory.length > 1) {
-      foodsWeAteAlongPath = this.changeHistory[this.changeHistory.length - 1]
-        .foodsWeAteAlongPath;
-      foodsTheyAteAlongPath = this.changeHistory[this.changeHistory.length - 1]
-        .foodsTheyAteAlongPath;
+      foodsWeAteAlongPath =
+        this.changeHistory[this.changeHistory.length - 1].foodsWeAteAlongPath;
+      foodsTheyAteAlongPath =
+        this.changeHistory[this.changeHistory.length - 1].foodsTheyAteAlongPath;
     }
 
     for (var i = 0; i < board.food.length; i++) {
@@ -90,15 +83,6 @@ function MinimaxGame(board) {
         }
       }
     }
-
-    // else {
-    //   for(var i = 0; i < board.food.length; i++) {
-    //     if(coordinatesAreEqual(board.food[i], snakeHeadCoordinate)) {
-    //       foodsEatenAlongPath++;
-    //       break;
-    //     }
-    //   }
-    // }
 
     // Create an object that describes the changes to the board on this move
     const newChange = {
@@ -277,8 +261,6 @@ const calcBestMove = function (
       beta,
       !isMaximizingPlayer
     )[0];
-    // Log the value of this move
-    // console.log(isMaximizingPlayer ? 'Max: ' : 'Min: ', depth, move, value, bestMove, bestMoveValue);
 
     if (isMaximizingPlayer) {
       // Look for moves that maximize position
@@ -295,11 +277,9 @@ const calcBestMove = function (
       }
       beta = Math.min(beta, value);
     }
-    // Undo previous move
     game.undo();
     // Check for alpha beta pruning
     if (beta <= alpha) {
-      // console.log('Prune', alpha, beta);
       if (logger) {
         logger.pruningAtCurrentNode();
       }
@@ -569,8 +549,7 @@ const evaluateBoard = (
   score += aggressionScore;
 
   // ********** HEURISTIC: KILL/DEATH *************
-  // gameOverValue is -500 if mySnake might die
-  // gameOverValue is -1000 if mySnake will for sure die
+
   const gameOverValue = evaluateIfGameOver(
     board,
     mySnakeID,
@@ -596,18 +575,7 @@ const evaluateBoard = (
         bottomNode.foodsTheyAteAlongPath * HEURISTIC.theirFoodVal;
     } else {
       const closestAppleDistance = distance(otherSnakeHead, theirClosestApple);
-
-      // if (logger) {
-      //   const heuristicInfo = {
-      //     closestAppleDist: closestAppleDistance
-      //   };
-      //   logger.logHeuristicDetails(heuristicInfo);
-      // }
-
       theirFoodScore = ((MAX_DISTANCE - closestAppleDistance) / 4) ** 2;
-      // console.log(closestAppleDistance)
-      // fix food
-      // console.log(foodScore);
     }
   }
 
@@ -617,20 +585,9 @@ const evaluateBoard = (
     } else {
       const closestAppleDistance = distance(mySnakeHead, closestApple);
 
-      // if (logger) {
-      //   const heuristicInfo = {
-      //     closestAppleDist: closestAppleDistance
-      //   };
-      //   logger.logHeuristicDetails(heuristicInfo);
-      // }
-
       foodScore = ((MAX_DISTANCE - closestAppleDistance) / 4) ** 2;
-      // console.log(closestAppleDistance)
-      // fix food
-      // console.log(foodScore);
     }
   }
-  // console.log(foodScore)
   score += foodScore;
   score += theirFoodScore;
 
@@ -709,12 +666,7 @@ const evaluateBoard = (
 
   score += edgesScore;
 
-  // // ********** HEURISTIC: CORNERS *************
-  // let cornerScore;
-  // cornerScore = MAX_DISTANCE - distanceToClosestCorner(otherSnakeHead, board);
-  // cornerScore -= (MAX_DISTANCE - distanceToClosestCorner(mySnakeHead, board)) / 2;
-  // score += cornerScore
-
+  // LOGGING
   if (logger) {
     const heuristicInfo = {
       Food: foodScore,
